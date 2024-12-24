@@ -1,19 +1,33 @@
 import { OrderTable, Sidebar } from "../components";
-import { HiOutlinePlus, HiOutlineChevronRight, HiOutlineSearch } from "react-icons/hi";
+import { HiOutlineChevronRight, HiOutlineSearch } from "react-icons/hi";
 import { AiOutlineExport } from "react-icons/ai";
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import orderApi from "../utils/api/orderApi";
-import userApi from "../utils/api/userApi";
+import orderApi from "@/utils/api/orderApi";
+import userApi from "@/utils/api/userApi";
 
-const Orders = () => {
-  const [orders, setOrders] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
+// Định nghĩa kiểu dữ liệu cho Order và User
+interface Order {
+  orderID: number;
+  customerID: number;
+  dateTime: string;
+  [key: string]: any;
+}
 
-  const [currentPage, setCurrentPage] = useState(1);
+interface User {
+  customerID: number;
+  firstName: string;
+  lastName: string;
+  [key: string]: any;
+}
+
+const Orders: React.FC = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const rowsPerPage = 10;
   const visiblePageCount = 3;
 
@@ -29,9 +43,9 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const fetchedOrders = await orderApi.getOrders();
+        const fetchedOrders: Order[] = await orderApi.getOrders();
         const sortedOrders = [...fetchedOrders].sort(
-          (a, b) => new Date(b.dateTime) - new Date(a.dateTime)
+          (a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
         );
         setOrders(sortedOrders);
       } catch (error) {
@@ -46,9 +60,9 @@ const Orders = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      setLoading(true);
       try {
-        const data = await userApi.getUsers();
+        setLoading(true);
+        const data: User[] = await userApi.getUsers();
         setUsers(data);
         setError(null);
       } catch (err) {
@@ -68,13 +82,13 @@ const Orders = () => {
     return fullName.includes(searchQuery.toLowerCase());
   });
 
-  // Get paginated data
+  // Lấy dữ liệu phân trang
   const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
@@ -134,10 +148,11 @@ const Orders = () => {
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`border border-gray-600 py-1 px-3 ${currentPage === page
+                  className={`border border-gray-600 py-1 px-3 ${
+                    currentPage === page
                       ? "dark:bg-whiteSecondary bg-blackPrimary dark:text-blackPrimary text-whiteSecondary"
                       : "dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary"
-                    } hover:border-gray-500`}
+                  } hover:border-gray-500`}
                 >
                   {page}
                 </button>

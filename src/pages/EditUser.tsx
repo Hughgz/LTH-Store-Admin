@@ -7,7 +7,6 @@ import {
   SimpleInput,
   WhiteButton,
 } from "../components";
-import SelectInput from "../components/SelectInput";
 import { useEffect, useState } from "react";
 
 const EditUser = () => {

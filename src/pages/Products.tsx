@@ -1,25 +1,32 @@
-import { Pagination, RowsPerPage, Sidebar, WhiteButton } from "../components";
+import { Sidebar, WhiteButton } from "../components";
 import { HiOutlinePlus, HiOutlineChevronRight, HiOutlineSearch } from "react-icons/hi";
 import { AiOutlineExport } from "react-icons/ai";
 import { useEffect, useState } from "react";
 import productApi from "../utils/api/productApi";
 import ProductTable from "../components/ProductTable";
 
-const Products = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState(null); // Error state
-  const [currentPage, setCurrentPage] = useState(1); // Current page
-  const [searchTerm, setSearchTerm] = useState(""); // State for search term
-  const rowsPerPage = 10; // Number of products per page
+// Định nghĩa kiểu dữ liệu cho Product
+interface Product {
+  id: number;
+  name: string;
+  [key: string]: any;
+}
 
-  // Calculate total pages
+const Products: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]); // Danh sách sản phẩm
+  const [loading, setLoading] = useState<boolean>(false); // Trạng thái tải
+  const [error, setError] = useState<string | null>(null); // Trạng thái lỗi
+  const [currentPage, setCurrentPage] = useState<number>(1); // Trang hiện tại
+  const [searchTerm, setSearchTerm] = useState<string>(""); // Từ khóa tìm kiếm
+  const rowsPerPage = 10; // Số sản phẩm mỗi trang
+
+  // Tính toán tổng số trang
   const totalPages = Math.ceil(products.length / rowsPerPage);
 
-  // Get paginated data
+  // Lọc sản phẩm theo từ khóa tìm kiếm và phân trang
   const paginatedProducts = products
     .filter((product) =>
-      `${product.name}`.toLowerCase().includes(searchTerm.toLowerCase()) // Filter products based on the search term
+      `${product.name}`.toLowerCase().includes(searchTerm.toLowerCase()) // Lọc sản phẩm dựa trên từ khóa tìm kiếm
     )
     .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
@@ -40,7 +47,7 @@ const Products = () => {
     fetchProducts();
   }, []);
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
@@ -92,7 +99,7 @@ const Products = () => {
               />
             </div>
           </div>
-          {/* Display products */}
+          {/* Hiển thị danh sách sản phẩm */}
           {loading ? (
             <p>Loading...</p>
           ) : error ? (
@@ -100,7 +107,7 @@ const Products = () => {
           ) : (
             <ProductTable products={paginatedProducts} />
           )}
-          {/* Pagination */}
+          {/* Phân trang */}
           <div className="flex justify-center items-center px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex gap-2">
               <button

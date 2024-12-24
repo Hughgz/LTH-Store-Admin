@@ -1,15 +1,18 @@
-import { ImageUpload, InputWithLabel, Sidebar } from "../components";
-import { HiOutlineSave } from "react-icons/hi";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { InputWithLabel, Sidebar } from "../components";
 import { AiOutlineSave } from "react-icons/ai";
 import SimpleInput from "../components/SimpleInput";
 import TextAreaInput from "../components/TextAreaInput";
-import SelectInput from "../components/SelectInput";
-import { selectList, stockStatusList } from "../utils/data";
-import { useState } from "react";
+interface FormData {
+  name: string;
+  brand: string;
+  imageURL: string;
+  description: string;
+  categoryID: number;
+}
 
-const CreateProduct = () => {
-  const [formData, setFormData] = useState({
+const CreateProduct: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     brand: "",
     imageURL: "",
@@ -17,13 +20,13 @@ const CreateProduct = () => {
     categoryID: 1,
   });
 
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof FormData, value: string | number) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleImageUpload = async (file) => {
+  const handleImageUpload = async (file: File) => {
     const cloudinaryApi = "https://lthshop.azurewebsites.net/Cloudinary/upload";
     const formData = new FormData();
     formData.append("file", file);
@@ -143,7 +146,7 @@ const CreateProduct = () => {
                     placeholder="Enter category ID..."
                     value={formData.categoryID}
                     onChange={(e) =>
-                      handleInputChange("categoryID", e.target.value)
+                      handleInputChange("categoryID", parseInt(e.target.value))
                     }
                   />
                 </InputWithLabel>
@@ -151,18 +154,19 @@ const CreateProduct = () => {
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                Product images
-              </h3>
-
+              <label htmlFor="image-upload" className="block text-sm font-medium text-gray-700">
+                Upload product image
+              </label>
               <input
+                id="image-upload"
                 type="file"
                 onChange={(e) => {
-                  if (e.target.files.length > 0) {
+                  if (e.target.files && e.target.files.length > 0) {
                     handleImageUpload(e.target.files[0]);
                   }
                 }}
                 disabled={isUploading}
+                className="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
               {isUploading && <p>Uploading image...</p>}
               {formData.imageURL && (
@@ -179,4 +183,5 @@ const CreateProduct = () => {
     </div>
   );
 };
+
 export default CreateProduct;

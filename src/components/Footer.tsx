@@ -1,13 +1,3 @@
-// *********************
-// Role of the component: The footer component
-// Name of the component: Footer.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <Footer />
-// Input parameters: No input parameters
-// Output: The footer component
-// *********************
-
 const navigation = [
   {
     name: "Facebook",
@@ -112,11 +102,6 @@ const Footer = () => {
               <item.icon />
             </a>
           ))}
-        </div>
-        <div className="mt-8 md:order-1 md:mt-0">
-          <p className="text-center text-base leading-5 black:text-whiteSecondary text-blackPrimary dark:text-whiteSecondary max-xl:text-sm">
-            Developed and designed by Aleksandar Kuzmanovic, @Kuzma02. Some icons are from <a target="_blank" href="https://www.flaticon.com/">Flaticon.com</a>.
-          </p>
         </div>
       </div>
     </footer>
