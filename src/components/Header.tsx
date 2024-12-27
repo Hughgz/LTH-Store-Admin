@@ -1,14 +1,3 @@
-// *********************
-// Role of the component: The header component
-// Name of the component: Header.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <Header />
-// Input parameters: No input parameters
-// Output: The header component
-// *********************
-
-import { FaReact } from "react-icons/fa6";
 import { HiOutlineMoon, HiOutlineSun } from "react-icons/hi";
 import { HiOutlineBell } from "react-icons/hi";
 import { HiOutlineMenu } from "react-icons/hi";
@@ -21,7 +10,7 @@ import { toggleDarkMode } from "../features/darkMode/darkModeSlice";
 const Header = () => {
   const dispatch = useAppDispatch();
   const { darkMode } = useAppSelector((state) => state.darkMode);
-
+  const user = useAppSelector((state) => state.auth.user);
   return (
     <header className="dark:bg-blackPrimary bg-whiteSecondary relative">
       <div className="flex justify-between items-center px-9 py-5 max-xl:flex-col max-xl:gap-y-7 max-[400px]:px-4">
@@ -30,7 +19,11 @@ const Header = () => {
           onClick={() => dispatch(setSidebar())}
         />
         <Link to="/">
-          <FaReact className="text-4xl dark:text-whiteSecondary text-blackPrimary hover:rotate-180 hover:duration-1000 hover:ease-in-out cursor-pointer" />
+          <img
+            src="https://res.cloudinary.com/dahzoj4fy/image/upload/v1733244037/fg6rbhwjrx2cyrq6uc7i.png"
+            alt="Profile"
+            className="rounded-full w-20 h-20"
+          />
         </Link>
         <SearchInput />
         <div className="flex gap-4 items-center max-xl:justify-center">
@@ -53,7 +46,7 @@ const Header = () => {
             <div className="flex gap-2 items-center">
               <div className="flex flex-col">
                 <p className="dark:text-whiteSecondary text-blackPrimary text-base max-xl:text-sm">
-                  Minh Hieu
+                  {user.username}
                 </p>
                 <p className="dark:text-whiteSecondary text-blackPrimary text-sm max-xl:text-xs">
                   Admin

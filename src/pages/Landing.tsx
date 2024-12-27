@@ -8,8 +8,11 @@ import {
   Welcome,
 } from "../components";
 import { BarChart, LineGraph, PieChart } from "../components/chart";
+import { useAppSelector } from "../hooks";
 
 const Landing = () => {
+    const user = useAppSelector((state) => state.auth.user);
+  
   return (
     <div className="h-auto border-t dark:border-blackSecondary border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
       <Sidebar />
@@ -17,9 +20,9 @@ const Landing = () => {
         <div>
           <div>
             <Welcome>
-              <Welcome.Title>Good evening, Sherwood 😀</Welcome.Title>
+              <Welcome.Title>Good evening, {user.username} 😀</Welcome.Title>
               <Welcome.Description>
-                Here is the complete overview of your eCommerce store. Analyze
+                Here is the complete overview of LTH Store. Analyze
                 the statistics and make smart decisions.
               </Welcome.Description>
               <Welcome.ActionButton onClick={() => console.log("Analyzing...")}>

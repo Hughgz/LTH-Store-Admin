@@ -45,26 +45,19 @@ const Sidebar = () => {
           onClick={() => dispatch(setSidebar())}
         />
         <div>
-          <div
-            onClick={() => setIsLandingOpen(() => !isLandingOpen)}
-            className="block flex items-center self-stretch gap-4 py-4 px-6 dark:bg-blackPrimary dark:hover:bg-blackSecondary cursor-pointer max-xl:py-3 dark:text-whiteSecondary hover:bg-white text-blackPrimary bg-whiteSecondary"
+          <NavLink
+            to="/"
+            className={(isActiveObj) =>
+              isActiveObj.isActive ? navActiveClass : navInactiveClass
+            }
           >
             <HiOutlineHome className="text-xl" />
             <span className="text-lg">Dashboard</span>
-          </div>
-          {isLandingOpen && (
-            <div>
-              <NavLink
-                to="/"
-                className={(isActiveObj) =>
-                  isActiveObj.isActive ? navActiveClass : navInactiveClass
-                }
-              >
-                <HiOutlineHome className="text-xl" />
-                <span className="text-lg">Overview v1</span>
-              </NavLink>
+          </NavLink>
+          <div>
 
-              <NavLink
+
+            {/* <NavLink
                 to="/landing-v2"
                 className={(isActiveObj) =>
                   isActiveObj.isActive ? navActiveClass : navInactiveClass
@@ -72,9 +65,8 @@ const Sidebar = () => {
               >
                 <HiOutlineHome className="text-xl" />
                 <span className="text-lg">Overview v2</span>
-              </NavLink>
-            </div>
-          )}
+              </NavLink> */}
+          </div>
 
           <NavLink
             to="/products"
@@ -85,7 +77,7 @@ const Sidebar = () => {
             <HiOutlineDevicePhoneMobile className="text-xl" />
             <span className="text-lg">Products</span>
           </NavLink>
-          
+
           <NavLink
             to="/orders"
             className={(isActiveObj) =>
@@ -104,7 +96,7 @@ const Sidebar = () => {
             <HiOutlineUser className="text-xl" />
             <span className="text-lg">Users</span>
           </NavLink>
-          
+
 
           <div
             onClick={() => setIsAuthOpen(() => !isAuthOpen)}
@@ -124,7 +116,7 @@ const Sidebar = () => {
                 <HiLogin className="text-xl" />
                 <span className="text-lg">Login</span>
               </NavLink>
-              <NavLink
+              {/* <NavLink
                 to="/register"
                 className={(isActiveObj) =>
                   isActiveObj.isActive ? navActiveClass : navInactiveClass
@@ -132,12 +124,12 @@ const Sidebar = () => {
               >
                 <HiUserGroup className="text-xl" />
                 <span className="text-lg">Register</span>
-              </NavLink>
+              </NavLink> */}
             </div>
           )}
         </div>
 
-        <div className="absolute bottom-0 border-1 border-t dark:border-blackSecondary border-blackSecondary w-full">
+        {/* <div className="absolute bottom-0 border-1 border-t dark:border-blackSecondary border-blackSecondary w-full">
           <NavLink
             to="/help-desk"
             className={(isActiveObj) =>
@@ -147,7 +139,7 @@ const Sidebar = () => {
             <HiOutlineInformationCircle className="text-xl" />
             <span className="text-lg">Help Desk</span>
           </NavLink>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -2,22 +2,36 @@ import { OrderTable, Sidebar } from "../components";
 import { HiOutlineChevronRight, HiOutlineSearch } from "react-icons/hi";
 import { AiOutlineExport } from "react-icons/ai";
 import { useEffect, useState } from "react";
-import orderApi from "@/utils/api/orderApi";
-import userApi from "@/utils/api/userApi";
+import orderApi from "../utils/api/orderApi";
+import userApi from "../utils/api/userApi";
 
 // Định nghĩa kiểu dữ liệu cho Order và User
 interface Order {
-  orderID: number;
-  customerID: number;
+  orderID: string;
+  customerID: string;
   dateTime: string;
-  [key: string]: any;
+  totalPrice: number;
+  paymentType: string;
+  status: string;
+  orderItems?: OrderItem[];
+}
+
+interface OrderItem {
+  product: {
+    imageURL: string;
+    name: string;
+  };
+  productSize: {
+    size: string;
+    price: number;
+  };
+  quantity: number;
 }
 
 interface User {
-  customerID: number;
+  customerID: string;
   firstName: string;
   lastName: string;
-  [key: string]: any;
 }
 
 const Orders: React.FC = () => {

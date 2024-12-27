@@ -1,12 +1,3 @@
-// *********************
-// Role of the component: SingleStats component that displays the single stats with the title and value
-// Name of the component: SingleStats.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <SingleStats title="New Orders" value="56" />
-// Input parameters: roles: { title: string; value: string }
-// Output: SingleStats component that displays the single stats with the title and value
-// *********************
 
 const SingleStats = ({ title, value }: { title: string; value: string }) => {
   return (

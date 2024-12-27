@@ -1,12 +1,3 @@
-// *********************
-// Role of the component: The component that displays conversion rate by source single activities
-// Name of the component: ConversionRateBySource.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <ConversionRateBySource />
-// Input parameters: No input parameters
-// Output: the component that displays conversion rate by source single activities
-// *********************
 
 import SingleActivity from "./SingleActivity";
 import { FaFacebook } from "react-icons/fa6";

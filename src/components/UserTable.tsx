@@ -1,10 +1,39 @@
 import { nanoid } from "nanoid";
 import { Link } from "react-router-dom";
-import { HiOutlinePencil } from "react-icons/hi";
-import { HiOutlineTrash } from "react-icons/hi";
-import { HiOutlineEye } from "react-icons/hi";
+import { HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
+import { useState, useEffect } from "react";
+import Spinder from "./Spinder"; // Import Spinder component
 
-const UserTable = ({ users }) => {
+interface User {
+  customerID: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string;
+  postalCode: string;
+}
+
+interface UserTableProps {
+  users: User[];
+}
+
+const UserTable: React.FC<UserTableProps> = ({ users }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true); // State for loading
+
+  useEffect(() => {
+    // Simulate loading effect
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); // 2 seconds loading
+
+    return () => clearTimeout(timer); // Clear timer on component unmount
+  }, []);
+
+  // Render loading spinner if data is loading
+  if (isLoading) {
+    return <Spinder />;
+  }
+
   return (
     <table className="mt-6 w-full whitespace-nowrap text-left max-lg:block max-lg:overflow-x-scroll">
       <colgroup>
@@ -82,6 +111,7 @@ const UserTable = ({ users }) => {
                   <HiOutlineEye className="text-lg" />
                 </Link>
                 <button
+                aria-label="Edit"
                   onClick={() => console.log("Delete user", user.customerID)}
                   className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
                 >

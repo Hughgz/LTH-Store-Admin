@@ -1,6 +1,6 @@
 'use client';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToWishlist, clearWishlist, removeFromWishlist } from '../../store/reducers/wishlistSlice';
+import { addToWishlist, clearWishlist, removeFromWishlist } from '../../redux/reducers/wishlistSlice';
 
 export const useWishlist = () => {
   const dispatch = useDispatch();

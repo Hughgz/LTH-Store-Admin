@@ -1,25 +1,31 @@
 import {
   HiOutlineChevronRight,
-  HiOutlinePlus,
   HiOutlineSearch,
 } from "react-icons/hi";
 import {
-  Pagination,
-  RowsPerPage,
   Sidebar,
   UserTable,
-  WhiteButton,
 } from "../components";
 import { AiOutlineExport } from "react-icons/ai";
 import { useEffect, useState } from "react";
 import userApi from "../utils/api/userApi";
 
+
+interface User {
+  customerID: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string;
+  postalCode: string;
+}
+
 const Users = () => {
-  const [users, setUsers] = useState([]); // All users data
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState(null); // Error state
-  const [currentPage, setCurrentPage] = useState(1); // Current page
-  const [searchQuery, setSearchQuery] = useState(""); // Search query
+  const [users, setUsers] = useState<User[]>([]); // All users data
+  const [loading, setLoading] = useState<boolean>(false); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
+  const [currentPage, setCurrentPage] = useState<number>(1); // Current page
+  const [searchQuery, setSearchQuery] = useState<string>(""); // Search query
   const rowsPerPage = 10; // Users per page
 
   // Calculate total pages

@@ -1,13 +1,3 @@
-// *********************
-// Role of the component: Total savings component that displays the total savings and the percentage of savings compared to the last month
-// Name of the component: TotalSavings.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <TotalSavings isPositive={true} percentage="25%" />
-// Input parameters: { isPositive: boolean, percentage: string }
-// Output: Total savings component that displays the total savings and the percentage of savings compared to the last month
-// *********************
-
 import SingleProgressElementTotalSavings from "./SingleProgressElementTotalSavings";
 
 const TotalSavings = ({

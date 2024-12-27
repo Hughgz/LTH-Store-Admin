@@ -2,8 +2,8 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, removeFromCart, updateQuantity, calculateSubtotal, getTotal, applyDiscount, clearCart, loadCart } from '../../store/reducers/cartSlice';
-import { formatPrice } from '../hooks/useUtil';
-import { selectCurrentUser } from '../../store/reducers/userSlice';
+import { formatPrice } from './useUtil';
+import { selectCurrentUser } from '../../redux/reducers/userSlice';
 
 export const useCart = () => {
   const dispatch = useDispatch();

@@ -1,12 +1,3 @@
-// *********************
-// Role of the component: Follow notification component that displays the follow notification
-// Name of the component: FollowNotification.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <SimpleNotification username="johndoe" imgSrc="/src/assets/random user 1.jpg" date="Thursday 4:20pm" hoursAgo="2 hours ago" action="followed you" />
-// Input parameters: roles: { username: string; imgSrc: string; date: string; hoursAgo: string; action: string }
-// Output: FollowNotification component that displays the follow notification
-// *********************
 
 const FollowNotification = ({
   imgSrc,

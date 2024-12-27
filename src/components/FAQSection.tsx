@@ -1,12 +1,3 @@
-// *********************
-// Role of the component: The component that displays frequesntly asked questions
-// Name of the component: FAQSection.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <FAQSection faqs={faqs} />
-// Input parameters: faqs: { question: string; answer: string }[]
-// Output: frequently asked questions
-// *********************
 
 const FAQSection = ({
   faqs,

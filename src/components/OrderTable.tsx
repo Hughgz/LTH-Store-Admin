@@ -4,15 +4,59 @@ import { HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
 import UpdateOrderModal from "./UpdateOrderModal";
 import OrderDetailModal from "./OrderDetailModal";
 import axios from "axios";
+import Spinder from "./Spinder"; // Import Spinder component
 
-const OrderTable = ({ orders, users }) => {
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [selectedOrderStatus, setSelectedOrderStatus] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState(null);
+interface User {
+  customerID: string;
+  firstName: string;
+  lastName: string;
+}
 
-  const handleOpenUpdateModal = (orderId, status) => {
+interface OrderItem {
+  product: {
+    imageURL: string;
+    name: string;
+  };
+  productSize: {
+    size: string;
+    price: number;
+  };
+  quantity: number;
+}
+
+interface Order {
+  orderID: string;
+  customerID: string;
+  dateTime: string;
+  totalPrice: number;
+  paymentType: string;
+  status: string;
+  orderItems?: OrderItem[];
+}
+
+interface OrderTableProps {
+  orders: Order[];
+  users: User[];
+}
+
+const OrderTable: React.FC<OrderTableProps> = ({ orders, users }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true); // State for loading
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [selectedOrderStatus, setSelectedOrderStatus] = useState<string>("");
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+  useEffect(() => {
+    // Simulate loading effect
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); // 2 seconds loading
+
+    return () => clearTimeout(timer); // Clear timer on component unmount
+  }, []);
+
+  const handleOpenUpdateModal = (orderId: string, status: string) => {
     setSelectedOrderId(orderId);
     setSelectedOrderStatus(status);
     setIsUpdateModalOpen(true);
@@ -23,12 +67,12 @@ const OrderTable = ({ orders, users }) => {
     setSelectedOrderId(null);
   };
 
-  const handleOpenDetailModal = async (order) => {
+  const handleOpenDetailModal = async (order: Order) => {
     try {
       const response = await axios.get(
         `https://lthshop.azurewebsites.net/api/OrderItems/${order.orderID}`
       );
-      const orderWithItems = {
+      const orderWithItems: Order = {
         ...order,
         orderItems: response.data,
       };
@@ -44,10 +88,15 @@ const OrderTable = ({ orders, users }) => {
     setSelectedOrder(null);
   };
 
-  const getCustomerName = (customerID) => {
+  const getCustomerName = (customerID: string): string => {
     const user = users.find((user) => user.customerID === customerID);
     return user ? `${user.firstName} ${user.lastName}` : "Unknown Customer";
   };
+
+  // Render loading spinner if data is loading
+  if (isLoading) {
+    return <Spinder />;
+  }
 
   return (
     <>
@@ -61,31 +110,18 @@ const OrderTable = ({ orders, users }) => {
         </colgroup>
         <thead className="border-b border-white/10 text-sm leading-6 dark:text-whiteSecondary text-blackPrimary">
           <tr>
-            <th
-              scope="col"
-              className="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8"
-            >
+            <th className="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8">
               Customer Name
             </th>
-            <th scope="col" className="py-2 pl-0 pr-8 font-semibold table-cell">
-              Date/Time
-            </th>
-            <th scope="col" className="py-2 pl-0 pr-8 font-semibold table-cell">
-              Price
-            </th>
-            <th scope="col" className="py-2 pl-0 pr-8 font-semibold table-cell">
+            <th className="py-2 pl-0 pr-8 font-semibold table-cell">Date/Time</th>
+            <th className="py-2 pl-0 pr-8 font-semibold table-cell">Price</th>
+            <th className="py-2 pl-0 pr-8 font-semibold table-cell">
               Payment Type
             </th>
-            <th
-              scope="col"
-              className="py-2 pl-0 pr-8 font-semibold table-cell lg:pr-20"
-            >
+            <th className="py-2 pl-0 pr-8 font-semibold table-cell lg:pr-20">
               Status
             </th>
-            <th
-              scope="col"
-              className="py-2 pl-0 pr-4 text-right font-semibold table-cell sm:pr-6 lg:pr-8"
-            >
+            <th className="py-2 pl-0 pr-4 text-right font-semibold table-cell sm:pr-6 lg:pr-8">
               Actions
             </th>
           </tr>
@@ -134,23 +170,22 @@ const OrderTable = ({ orders, users }) => {
               <td className="py-4 pl-0 pr-4 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
                 <div className="flex gap-x-1 justify-end">
                   <button
-                    onClick={() => handleOpenUpdateModal(order.orderID, order.status)}
+                    onClick={() =>
+                      handleOpenUpdateModal(order.orderID, order.status)
+                    }
                     className="bg-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 flex justify-center items-center hover:border-gray-400"
+                    aria-label="Edit Order"
                   >
                     <HiOutlinePencil className="text-lg" />
                   </button>
+
                   <button
                     onClick={() => handleOpenDetailModal(order)}
                     className="bg-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 flex justify-center items-center hover:border-gray-400"
+                    aria-label="View Order Details"
                   >
                     <HiOutlineEye className="text-lg" />
                   </button>
-                  {/* <button
-                    onClick={() => console.log("Delete order", order.orderID)}
-                    className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer hover:border-gray-400"
-                  >
-                    <HiOutlineTrash className="text-lg" />
-                  </button> */}
                 </div>
               </td>
             </tr>

@@ -1,12 +1,3 @@
-// *********************
-// Role of the component: SingleActivity component that displays the single activity with the main title, total visitors, total money, and percentage
-// Name of the component: SingleActivity.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <SingleActivity mainTitle="Hour" totalVisitors="200" totalMoney="$50,00" percent="+5%"><FaClock className="dark:text-blackPrimary text-whiteSecondary text-3xl" /></SingleActivity>
-// Input parameters: roles: { children: React.ReactNode; mainTitle: string; totalVisitors: string; totalMoney: string; percent: string }
-// Output: SingleActivity component that displays the single activity with the main title, total visitors, total money, and percentage
-// *********************
 
 interface ISingleActivityProps {
   children: React.ReactNode;

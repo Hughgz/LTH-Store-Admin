@@ -1,7 +1,6 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import productApi from '../../utils/api/productApi';
-import sizeApi from '../../utils/api/sizeApi';
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
@@ -38,13 +37,13 @@ export const fetchProducts = createAsyncThunk(
     return createdProduct;
   });
   
-  export const updateExistingProduct = createAsyncThunk(
-    'products/updateExistingProduct',
-    async ({ productId, product }) => {
-      const updatedProduct = await productApi.updateProduct(productId, product);
-      return updatedProduct;
-    }
-  );
+  // export const updateExistingProduct = createAsyncThunk(
+  //   'products/updateExistingProduct',
+  //   async ({ productId, product }) => {
+  //     const updatedProduct = await productApi.updateProduct(productId, product);
+  //     return updatedProduct;
+  //   }
+  // );
   
   export const removeProduct = createAsyncThunk('products/removeProduct', async (productId) => {
     const deletedProduct = await productApi.deleteProduct(productId);

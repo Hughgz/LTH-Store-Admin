@@ -1,12 +1,3 @@
-// *********************
-// Role of the component: Reviews table component that displays the reviews in a table
-// Name of the component: ReviewsTable.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <ReviewsTable />
-// Input parameters: no input parameters
-// Output: ReviewsTable component that displays the reviews in a table
-// *********************
 
 import { nanoid } from "nanoid";
 import { Link } from "react-router-dom";
@@ -78,7 +69,7 @@ const ReviewsTable = () => {
                 </div>
               </div>
             </td>
-            <td className="py-4 pl-0 pr-4 table-cell pr-8">
+            <td className="py-4 pl-0 table-cell pr-8">
               <div className="flex gap-x-3">
                 <div className="text-lg leading-6 py-1 flex">
                   {renderStars(item.rating)}
@@ -95,23 +86,23 @@ const ReviewsTable = () => {
             <td className="py-4 pl-0 pr-8 text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell lg:pr-20">
               {item.lastLogin}
             </td>
-            <td className="py-4 pl-0 pr-4 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
+            <td className="py-4 pl-0 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
               <div className="flex gap-x-1 justify-end">
                 <Link
                   to="/reviews/1"
-                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
+                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
                 >
                   <HiOutlinePencil className="text-lg" />
                 </Link>
                 <Link
                   to="/reviews/1"
-                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
+                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
                 >
                   <HiOutlineEye className="text-lg" />
                 </Link>
                 <Link
                   to="#"
-                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
+                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
                 >
                   <HiOutlineTrash className="text-lg" />
                 </Link>

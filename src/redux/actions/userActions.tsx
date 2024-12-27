@@ -27,14 +27,14 @@ export const createUser = createAsyncThunk("user/createUser", async (user) => {
   return newUser;
 });
 
-// Đăng ký người dùng mới
-export const registerUser = createAsyncThunk("user/registerUser", async (user) => {
-  try {
-    const response = await userApi.registerUser(user);
-    console.log("Registration successful:", response);
-    return response;
-  } catch (error) {
-    console.error("Registration failed:", error);
-    throw error.response?.data || "Registration failed";
-  }
-});
+// // Đăng ký người dùng mới
+// export const registerUser = createAsyncThunk("user/registerUser", async (user) => {
+//   try {
+//     const response = await userApi.registerUser(user);
+//     console.log("Registration successful:", response);
+//     return response;
+//   } catch (error) {
+//     console.error("Registration failed:", error);
+//     throw error.response?.data || "Registration failed";
+//   }
+// });

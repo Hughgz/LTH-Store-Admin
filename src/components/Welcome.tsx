@@ -1,25 +1,3 @@
-// *********************
-// Role of the component: Welcome component that displays the welcome message with the title, description, and action button
-// Name of the component: Welcome.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call:
-{
-  /* <Welcome>
-  <Welcome.Title>Good evening, Sherwood 😀</Welcome.Title>
-  <Welcome.Description>
-    Here is the complete overview of your eCommerce store. Analyze the
-    statistics and make smart decisions.
-  </Welcome.Description>
-  <Welcome.ActionButton onClick={() => console.log("Analyzing...")}>
-    Analyze the statistics
-  </Welcome.ActionButton>
-</Welcome>; */
-}
-// Input parameters: Welcome.Title, Welcome.Description, Welcome.ActionButton
-// Output: Welcome component that displays the welcome message with the title, description, and action button
-// *********************
-
 const Welcome = ({ children }: { children: React.ReactNode }) => {
   return <div className="flex flex-col gap-y-4 py-7">{children}</div>;
 };

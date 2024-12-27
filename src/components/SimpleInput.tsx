@@ -1,13 +1,3 @@
-// *********************
-// Role of the component: Simple input component that displays the input field
-// Name of the component: SimpleInput.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <InputWithLabel label="Confirm password"><SimpleInput type="password" placeholder="Enter a confirm password..." /></InputWithLabel>
-// Input parameters: roles: no input parameters
-// Output: SimpleInput component that displays the input field
-// *********************
-
 interface SimpleInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   placeholder?: string;
   type?: string;

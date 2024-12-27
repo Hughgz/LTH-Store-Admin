@@ -1,28 +1,58 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 import { Link } from "react-router-dom";
-import { HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
-import { AiOutlinePlus } from "react-icons/ai";  // Import icon Add
+import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
+import { AiOutlinePlus } from "react-icons/ai";
 import { AddProductSize } from "../pages";
+import Spinder from "./Spinder";
 
-const ProductTable = ({ products }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [addProductSize, setAddProductSize] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedProductId, setSelectedProductId] = useState(null);
+interface ProductSize {
+  size: string;
+  price: number;
+  quantity: number;
+}
 
-  const handleOpenAddProductSizeModal = (productID) => {
+interface Product {
+  productID: string;
+  name: string;
+  imageURL: string;
+  brand: string;
+  productSizes: ProductSize[];
+}
+
+interface ProductTableProps {
+  products: Product[];
+}
+
+const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleOpenAddProductSizeModal = (productID: string) => {
     setSelectedProductId(productID);
     setIsModalOpen(true);
   };
+
   const handleCloseAddProductSizeModal = () => {
     setIsModalOpen(false);
     setSelectedProductId(null);
   };
-  const inStockClass =
-    "text-green-400 bg-green-400/10 flex-none rounded-full p-1";
-  const outOfStockClass =
-    "text-rose-400 bg-rose-400/10 flex-none rounded-full p-1";
+
+  const inStockClass = "text-green-400 bg-green-400/10 flex-none rounded-full p-1";
+  const outOfStockClass = "text-rose-400 bg-rose-400/10 flex-none rounded-full p-1";
+
+  if (isLoading) {
+    return <Spinder />;
+  }
 
   return (
     <>
@@ -48,7 +78,7 @@ const ProductTable = ({ products }) => {
         <tbody className="divide-y divide-white/5">
           {products.map((item) => {
             const sizes = item.productSizes.map((size) => size.size).join(", ");
-            const price = item.productSizes[0]?.price || 0; // Display the price of the first size
+            const price = item.productSizes[0]?.price || 0;
             const isInStock = item.productSizes.some((size) => size.quantity > 0);
 
             return (
@@ -65,7 +95,7 @@ const ProductTable = ({ products }) => {
                     </div>
                   </div>
                 </td>
-                <td className="py-4 pl-0 pr-4 table-cell pr-8">
+                <td className="py-4 pl-0 table-cell pr-8">
                   <div className="flex gap-x-3">
                     <div className="font-mono text-sm leading-6 dark:text-whiteSecondary text-blackPrimary">
                       {item.brand}
@@ -74,9 +104,7 @@ const ProductTable = ({ products }) => {
                 </td>
                 <td className="py-4 pl-0 pr-4 text-sm leading-6 sm:pr-8 lg:pr-20">
                   <div className="flex items-center gap-x-2 justify-start">
-                    <div
-                      className={isInStock ? inStockClass : outOfStockClass}
-                    >
+                    <div className={isInStock ? inStockClass : outOfStockClass}>
                       <div className="h-1.5 w-1.5 rounded-full bg-current" />
                     </div>
                     <div className="dark:text-whiteSecondary text-blackPrimary block">
@@ -85,38 +113,30 @@ const ProductTable = ({ products }) => {
                   </div>
                 </td>
                 <td className="py-4 pl-0 pr-8 text-sm leading-6 dark:text-rose-200 text-rose-600 font-medium table-cell lg:pr-20">
-                  {parseFloat(price).toLocaleString("en-US", {
+                  {price.toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}
                 </td>
-                <td className="py-4 pl-0 pr-4 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
+                <td className="py-4 pl-0 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
                   <div className="flex gap-x-1 justify-end">
-                    {/* Add Product Button */}
                     <button
+                      aria-label="Edit Order"
                       onClick={() => handleOpenAddProductSizeModal(item.productID)}
-                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer hover:border-gray-400"
+                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block justify-center items-center cursor-pointer hover:border-gray-400"
                     >
                       <AiOutlinePlus className="text-lg" />
                     </button>
-                    {/* Edit Product Button */}
                     <Link
                       to={`/products/edit/${item.productID}`}
-                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer hover:border-gray-400"
+                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block justify-center items-center cursor-pointer hover:border-gray-400"
                     >
                       <HiOutlinePencil className="text-lg" />
                     </Link>
-                    {/* View Product Button
-                    <Link
-                      to={`/products/${item.productID}`}
-                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer hover:border-gray-400"
-                    >
-                      <HiOutlineEye className="text-lg" />
-                    </Link> */}
-                    {/* Delete Product Button */}
                     <button
+                      aria-label="Edit Order"
                       onClick={() => console.log("Delete product", item.productID)}
-                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer hover:border-gray-400"
+                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block justify-center items-center cursor-pointer hover:border-gray-400"
                     >
                       <HiOutlineTrash className="text-lg" />
                     </button>

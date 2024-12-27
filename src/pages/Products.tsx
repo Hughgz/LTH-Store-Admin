@@ -5,11 +5,18 @@ import { useEffect, useState } from "react";
 import productApi from "../utils/api/productApi";
 import ProductTable from "../components/ProductTable";
 
+interface ProductSize {
+  size: string;
+  price: number;
+  quantity: number;
+}
 // Định nghĩa kiểu dữ liệu cho Product
 interface Product {
-  id: number;
+  productID: string;
   name: string;
-  [key: string]: any;
+  imageURL: string;
+  brand: string;
+  productSizes: ProductSize[];
 }
 
 const Products: React.FC = () => {

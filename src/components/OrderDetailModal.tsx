@@ -1,19 +1,43 @@
 import React from "react";
 
-const OrderDetailModal = ({ isModalOpen, closeModal, selectedOrder }) => {
+// Định nghĩa kiểu dữ liệu cho prop của modal
+interface OrderItem {
+  product: {
+    imageURL: string;
+    name: string;
+  };
+  productSize: {
+    size: string;
+    price: number;
+  };
+  quantity: number;
+}
+
+interface Order {
+  orderID: string;
+  dateTime: string;
+  status: string;
+  orderItems?: OrderItem[]; // Make orderItems optional
+}
+
+interface OrderDetailModalProps {
+  isModalOpen: boolean;
+  closeModal: () => void;
+  selectedOrder: Order | null;
+}
+
+
+const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
+  isModalOpen,
+  closeModal,
+  selectedOrder,
+}) => {
   // Kiểm tra nếu không có đơn hàng được chọn
   if (!isModalOpen || !selectedOrder) return null;
 
   // Hàm định dạng ngày/giờ
-  const formatDateTime = (dateTime) => {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Date(dateTime).toLocaleString("en-US", options);
+  const formatDateTime = (dateTime: string): string => {
+    return new Date(dateTime).toLocaleString("en-US");
   };
 
   return (
@@ -66,13 +90,13 @@ const OrderDetailModal = ({ isModalOpen, closeModal, selectedOrder }) => {
                     <td className="px-6 py-3 text-sm text-gray-800">{item.productSize.size}</td>
                     <td className="px-6 py-3 text-sm text-gray-800">{item.quantity}</td>
                     <td className="px-6 py-3 text-sm text-gray-800">
-                      {parseFloat(item.productSize.price).toLocaleString("vi-VN", {
+                      {item.productSize.price.toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
                       })}
                     </td>
                     <td className="px-6 py-3 text-sm text-gray-800">
-                      {parseFloat(item.quantity * item.productSize.price).toLocaleString("vi-VN", {
+                      {(item.quantity * item.productSize.price).toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
                       })}

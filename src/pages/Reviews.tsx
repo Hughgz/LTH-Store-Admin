@@ -59,6 +59,7 @@ const Reviews = () => {
                 className="w-60 h-10 dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 dark:text-whiteSecondary text-blackPrimary outline-0 pl-3 pr-8 cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
                 name="sort"
                 id="sort"
+                aria-label="Select number of rows"
               >
                 <option value="default">Sort by</option>
                 <option value="az">A-Z</option>
