@@ -9,7 +9,6 @@ import {
   HelpDesk,
   HomeLayout,
   Landing,
-  LandingV2,
   Login,
   Notifications,
   Orders,
@@ -18,7 +17,6 @@ import {
   Register,
   Users,
 } from "./pages";
-import AddProductSize from "./pages/CreateProductSize";
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -35,10 +33,6 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Landing />,
-      },
-      {
-        path: "/landing-v2",
-        element: <LandingV2 />,
       },
       {
         path: "/products",
