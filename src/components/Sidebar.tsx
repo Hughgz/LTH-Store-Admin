@@ -11,7 +11,6 @@
 import { HiLogin, HiOutlineHome, HiUserGroup } from "react-icons/hi";
 import { HiOutlineDevicePhoneMobile } from "react-icons/hi2";
 import { HiOutlineTruck } from "react-icons/hi";
-import { HiOutlineInformationCircle } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { HiOutlineX } from "react-icons/hi";
 import { setSidebar } from "../features/dashboard/dashboardSlice";
@@ -20,7 +19,6 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
 const Sidebar = () => {
-  const [isLandingOpen, setIsLandingOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const { isSidebarOpen } = useAppSelector((state) => state.dashboard);
   const dispatch = useAppDispatch();

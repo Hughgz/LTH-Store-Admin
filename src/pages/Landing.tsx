@@ -20,7 +20,7 @@ const Landing = () => {
         <div>
           <div>
             <Welcome>
-              <Welcome.Title>Good evening, {user.username} 😀</Welcome.Title>
+              <Welcome.Title>Good evening,{user ? user.username : 'Guest'} 😀</Welcome.Title>
               <Welcome.Description>
                 Here is the complete overview of LTH Store. Analyze
                 the statistics and make smart decisions.

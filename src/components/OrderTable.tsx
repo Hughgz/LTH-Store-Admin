@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
-import { HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
+import { HiOutlinePencil, HiOutlineEye } from "react-icons/hi";
 import UpdateOrderModal from "./UpdateOrderModal";
 import OrderDetailModal from "./OrderDetailModal";
 import axios from "axios";
@@ -134,7 +134,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, users }) => {
                   {getCustomerName(order.customerID)}
                 </div>
               </td>
-              <td className="py-4 pl-0 pr-4 table-cell pr-8">
+              <td className="py-4 pl-0 table-cell pr-8">
                 <div className="text-sm leading-6 dark:text-whiteSecondary text-blackPrimary">
                   {new Date(order.dateTime).toLocaleString()}
                 </div>
