@@ -1,46 +1,37 @@
 'use client';
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser, getUsers, login } from "../../store/actions/userActions";
-import { selectCurrentUser, selectError, selectIsLoading, selectToken, setUser } from "../../store/reducers/userSlice";
+import { getUser, getUsers } from "../../redux/actions/userActions";
+import { selectCurrentUser, selectError, selectIsLoading, selectToken } from "../../redux/reducers/userSlice";
+import { AppDispatch } from "../../store";
 
 export const useUser = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const token = useSelector(selectToken);
   const currentUser = useSelector(selectCurrentUser);
   const isLoading = useSelector(selectIsLoading);
   const error = useSelector(selectError);
 
-  const getUsersHandler = async () => {
-    await dispatch(getUsers());
+  const getUsersHandler = () => {
+    dispatch(getUsers());
   };
 
-  const getUserHandler = async (userId) => {
-    await dispatch(getUser(userId));
+  const getUserHandler = (userId: number) => {
+    dispatch(getUser(userId));
   };
-
-  const loginHandler = async (loginData) => {
-    const { payload: userId } = await dispatch(login(loginData));
-    const { payload: user } = await dispatch(getUser(userId));
-    if (user) {
-      dispatch(setUser(user));
-    }
-    return user;
-  };
-
 
   useEffect(() => {
-    if (token ) {
+    if (token) {
+      // Nếu token đã có, có thể thực hiện các hành động cần thiết như tải lại người dùng.
     }
   }, [token]);
 
-  return { 
-    login: loginHandler, 
+  return {
     getUsers: getUsersHandler,
     getUser: getUserHandler,
-    token, 
+    token,
     currentUser,
     isLoading,
     error,
-    logout: () => dispatch(logout()) };
+  };
 };

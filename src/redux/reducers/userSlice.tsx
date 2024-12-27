@@ -1,20 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, createUser, registerUser } from "../actions/userActions";
+import { RootState } from '../../store';
 
-// Hàm an toàn để parse JSON
-const safeParseJSON = (value, defaultValue = null) => {
-  try {
-    return value ? JSON.parse(value) : defaultValue;
-  } catch {
-    return defaultValue;
-  }
-};
+
 
 // Giá trị ban đầu với kiểm tra client-side
 const initialState = {
   currentUser:
     typeof window !== "undefined"
-      ? safeParseJSON(localStorage.getItem("currentUser"), null)
+      ? localStorage.getItem("currentUser")
       : null,
   token:
     typeof window !== "undefined" ? localStorage.getItem("token") || "" : "",
@@ -47,80 +40,13 @@ export const userSlice = createSlice({
       state.error = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    builder
-      // Login
-      .addCase(login.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.error = null;
-        state.token = action.payload.token;
-        state.currentUser = action.payload.customer;
-
-        if (typeof window !== "undefined") {
-          localStorage.setItem(
-            "currentUser",
-            JSON.stringify(action.payload.customer)
-          );
-          localStorage.setItem("token", action.payload.token);
-        }
-      })
-      .addCase(login.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message;
-        state.token = "";
-        state.currentUser = null;
-
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("currentUser");
-          localStorage.removeItem("token");
-        }
-      })
-      // Create User
-      .addCase(createUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(createUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.currentUser = action.payload;
-        state.token = action.payload.token;
-
-        if (typeof window !== "undefined") {
-          localStorage.setItem("currentUser", JSON.stringify(action.payload));
-          localStorage.setItem("token", action.payload.token);
-        }
-      })
-      .addCase(createUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message;
-      })
-      // Register User
-      .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.currentUser = action.payload;
-        state.token = action.payload.token;
-
-        if (typeof window !== "undefined") {
-          localStorage.setItem("currentUser", JSON.stringify(action.payload));
-          localStorage.setItem("token", action.payload.token);
-        }
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message;
-      });
-  },
 });
 
 export const { logout, setUser, setLoading, setError } = userSlice.actions;
 
-export const selectToken = (state) => state.user.token;
-export const selectCurrentUser = (state) => state.user.currentUser;
-export const selectIsLoading = (state) => state.user.isLoading;
-export const selectError = (state) => state.user.error;
+export const selectToken = (state: RootState) => state.user.token;
+export const selectCurrentUser = (state: RootState) => state.user.currentUser;
+export const selectIsLoading = (state: RootState) => state.user.isLoading;
+export const selectError = (state: RootState) => state.user.error;
 
 export default userSlice.reducer;

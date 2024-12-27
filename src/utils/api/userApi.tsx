@@ -1,84 +1,108 @@
 import axios from 'axios';
-import { variables } from './variables.js';
+import { variables } from './variables';
 
-const API_URL = variables.CUSTOMER_API
-const API_URL_AUTHEN = variables.AUTHEN_API
-const API_URL_CART = variables.CART_API;
+const API_URL = variables.CUSTOMER_API;
+const API_URL_AUTHEN = variables.AUTHEN_API;
 const API_URL_CART_ITEM = variables.CART_ITEM_API;
 
-const getUsers = async () => {
-  const response = await axios.get(API_URL);
-  return response.data;
+// Định nghĩa kiểu dữ liệu
+interface User {
+  customerID: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string;
+  postalCode: string;
 }
 
-const getUser = async (userId) => {
+interface LoginData {
+  email: string;
+  password: string;
+}
+
+interface CartItem {
+  customerId: number;
+  productSizeID: string;
+  quantity: number;
+}
+
+// Lấy danh sách người dùng
+const getUsers = async (): Promise<User[]> => {
+  const response = await axios.get<User[]>(API_URL);
+  return response.data;
+};
+
+// Lấy thông tin người dùng theo ID
+const getUser = async (userId: number): Promise<User> => {
   console.log('userId', userId);
-  const response = await axios.get(`${API_URL}/${userId}`);
+  const response = await axios.get<User>(`${API_URL}/${userId}`);
   return response.data;
-}
+};
 
-const createUser = async (user) => {
-  const response = await axios.post(API_URL, user);
+// Tạo người dùng mới
+const createUser = async (user: User): Promise<User> => {
+  const response = await axios.post<User>(API_URL, user);
   return response.data;
-}
+};
 
-const registerUser = async (user) => {
-  const response = await axios.post(`${API_URL_AUTHEN}/register`, user);
+// Đăng ký người dùng
+const registerUser = async (user: User): Promise<User> => {
+  const response = await axios.post<User>(`${API_URL_AUTHEN}/register`, user);
   return response.data;
-}
+};
 
-const updateUser = async (userId, user) => {
-  const response = await axios.put(`${API_URL}/${userId}`, user);
+// Cập nhật thông tin người dùng
+const updateUser = async (userId: string, user: User): Promise<User> => {
+  const response = await axios.put<User>(`${API_URL}/${userId}`, user);
   return response.data;
-}
+};
 
-const deleteUser = async (userId) => {
-  const response = await axios.delete(`${API_URL}/${userId}`);
-  return response.data;
-}
+// Xóa người dùng
+const deleteUser = async (userId: string): Promise<void> => {
+  await axios.delete(`${API_URL}/${userId}`);
+};
 
-const login = async (loginData) => {
+// Đăng nhập
+const login = async (loginData: LoginData): Promise<number | { token: null }> => {
   try {
     const response = await axios.post(`${API_URL_AUTHEN}/login-customer`, loginData);
     if (response.data.token) {
-      // Lấy userId từ response và lấy cartId của người dùng
-      const userId = response.data.customer.customerID;
-      console.log("userId: ", userId)
+      const userId: number = Number(response.data.customer.customerID); // Chuyển về `number`
+      console.log("userId: ", userId);
 
-      // Kiểm tra xem session Storage có lưu cartItem hay ko?
-      const data = sessionStorage.getItem('cartItems');
+      // Xử lý sessionStorage
+      const data = sessionStorage.getItem("cartItems");
       if (data) {
-        const cartItems = JSON.parse(data).map((item) => ({
+        const cartItems: CartItem[] = JSON.parse(data).map((item: any) => ({
           customerId: userId,
           productSizeID: item.productSizeID,
           quantity: item.quantity,
         }));
-      
+
         try {
-          axios.post(`${API_URL_CART_ITEM}/updateSession`, cartItems);
-          
-          // Xóa cartItems khỏi sessionStorage sau khi hoàn thành
-          sessionStorage.removeItem('cartItems');
-          console.log('Cart items have been successfully updated to the server.');
+          await axios.post(`${API_URL_CART_ITEM}/updateSession`, cartItems);
+          sessionStorage.removeItem("cartItems");
+          console.log("Cart items have been successfully updated to the server.");
         } catch (error) {
-          console.error('Error updating cart items to the server:', error);
+          console.error("Error updating cart items to the server:", error);
         }
       } else {
-        console.log('No cart items found in sessionStorage.');
+        console.log("No cart items found in sessionStorage.");
       }
-      
-      return  userId; 
+
+      return userId; // Trả về `number`
     }
     return { token: null };
-  } catch (error) {
+  } catch (error: any) {
     if (error.response && error.response.status === 401) {
-      alert('Invalid email or password');
+      alert("Invalid email or password");
     } else {
-      alert('An error occurred');
+      alert("An error occurred");
     }
     return { token: null };
   }
 };
+
 
 export default {
   login,
@@ -87,5 +111,5 @@ export default {
   createUser,
   registerUser,
   updateUser,
-  deleteUser
+  deleteUser,
 };
