@@ -5,13 +5,25 @@ const API_URL = variables.ORDER_API;
 
 // Định nghĩa kiểu dữ liệu cho một Order (tùy chỉnh theo cấu trúc của bạn)
 interface Order {
-  id?: string;
-  userId: string;
-  items: { productId: string; quantity: number; price: number }[];
-  totalAmount: number;
-  paymentMethod: string;
-  status?: string;
-  [key: string]: any; // Cho phép thêm các thuộc tính khác nếu cần
+  orderID: string;
+  customerID: string;
+  dateTime: string;
+  totalPrice: number;
+  paymentType: string;
+  status: string;
+  orderItems?: OrderItem[];
+}
+
+interface OrderItem {
+  product: {
+    imageURL: string;
+    name: string;
+  };
+  productSize: {
+    size: string;
+    price: number;
+  };
+  quantity: number;
 }
 
 // Lấy tất cả orders

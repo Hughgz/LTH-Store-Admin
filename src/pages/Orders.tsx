@@ -37,8 +37,6 @@ interface User {
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -56,7 +54,6 @@ const Orders: React.FC = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        setLoading(true);
         const fetchedOrders: Order[] = await orderApi.getOrders();
         const sortedOrders = [...fetchedOrders].sort(
           (a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
@@ -64,10 +61,7 @@ const Orders: React.FC = () => {
         setOrders(sortedOrders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
-        setError("Failed to fetch orders");
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
     fetchOrders();
   }, []);
@@ -75,14 +69,10 @@ const Orders: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        setLoading(true);
         const data: User[] = await userApi.getUsers();
         setUsers(data);
-        setError(null);
       } catch (err) {
-        setError("Failed to fetch users");
-      } finally {
-        setLoading(false);
+        console.error("Failed to fetch orders:", err);
       }
     };
 

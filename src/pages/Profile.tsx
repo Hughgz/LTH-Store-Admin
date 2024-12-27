@@ -1,6 +1,5 @@
-import { HiOutlineSave, HiOutlineUpload, HiOutlineUser } from "react-icons/hi";
+import { HiOutlineSave, HiOutlineUpload } from "react-icons/hi";
 import { InputWithLabel, Sidebar, SimpleInput, WhiteButton } from "../components";
-import { useState } from "react";
 import { useAppSelector } from "../hooks";
 
 const Profile = () => {
@@ -40,7 +39,7 @@ const Profile = () => {
                   />
                   <div>
                     <p className="dark:text-whiteSecondary text-blackPrimary text-xl">
-                      {user.username}
+                    {user ? user.username : 'Guest'}
                     </p>
                     <p className="dark:text-whiteSecondary text-blackPrimary">
                       Admin
@@ -61,14 +60,14 @@ const Profile = () => {
                   <SimpleInput
                     type="text"
                     placeholder="Your username"
-                    value={user.username}
+                    value={user ? user.username : 'Guest'}
                   />
                 </InputWithLabel>
                 <InputWithLabel label="Your email">
                   <SimpleInput
                     type="text"
                     placeholder="Your email"
-                    value={user.email}
+                    value={user ? user.username : 'minhtan@gmail.com'}
 
                   />
                 </InputWithLabel>
