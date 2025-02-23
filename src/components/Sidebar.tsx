@@ -1,25 +1,21 @@
-import { HiLogin, HiOutlineHome, HiUserGroup } from "react-icons/hi";
+import { HiLogin, HiOutlineHome, HiUserGroup, HiOutlineChevronDown } from "react-icons/hi";
 import { HiOutlineDevicePhoneMobile } from "react-icons/hi2";
-import { HiOutlineTruck } from "react-icons/hi";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { HiOutlineX } from "react-icons/hi";
-import { setSidebar } from "../features/dashboard/dashboardSlice";
-import { HiOutlineUser } from "react-icons/hi";
+import { HiOutlineTruck, HiOutlineX, HiOutlineUser } from "react-icons/hi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "../hooks";
+import { setSidebar } from "../features/dashboard/dashboardSlice";
 import { useAuth } from "../utils/hooks/useAuth";
 
 const Sidebar = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isProductOpen, setIsProductOpen] = useState(false); // Dropdown sản phẩm
   const { isSidebarOpen } = useAppSelector((state) => state.dashboard);
   const dispatch = useAppDispatch();
-  const { token, logoutUser } = useAuth();  // Lấy token và logoutUser từ useAuth
+  const { token, logoutUser } = useAuth();
   const navigate = useNavigate();
 
-  // Determine the sidebar class based on isSidebarOpen
-  const sidebarClass: string = isSidebarOpen
-    ? "sidebar-open"
-    : "sidebar-closed";
+  const sidebarClass: string = isSidebarOpen ? "sidebar-open" : "sidebar-closed";
 
   const navActiveClass: string =
     "block dark:bg-whiteSecondary flex items-center self-stretch gap-4 py-4 px-6 cursor-pointer max-xl:py-3 dark:text-blackPrimary bg-white text-blackPrimary";
@@ -28,8 +24,8 @@ const Sidebar = () => {
 
   // Hàm logout
   const handleLogout = () => {
-    logoutUser();  // Gọi hàm logout từ useAuth để đăng xuất
-    navigate("/login");  // Điều hướng đến trang login sau khi logout
+    logoutUser();
+    navigate("/login");
   };
 
   return (
@@ -42,48 +38,92 @@ const Sidebar = () => {
           onClick={() => dispatch(setSidebar())}
         />
         <div>
+          {/* Dashboard */}
           <NavLink
             to="/"
-            className={(isActiveObj) =>
-              isActiveObj.isActive ? navActiveClass : navInactiveClass
-            }
+            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
           >
             <HiOutlineHome className="text-xl" />
             <span className="text-lg">Dashboard</span>
           </NavLink>
 
-          <NavLink
-            to="/products"
-            className={(isActiveObj) =>
-              isActiveObj.isActive ? navActiveClass : navInactiveClass
-            }
+          {/* Products Dropdown */}
+          <div
+            onClick={() => setIsProductOpen(!isProductOpen)}
+            className="block flex items-center justify-between self-stretch gap-4 py-4 px-6 dark:bg-blackPrimary dark:hover:bg-blackSecondary cursor-pointer max-xl:py-3 dark:text-whiteSecondary hover:bg-white text-blackPrimary bg-whiteSecondary"
           >
-            <HiOutlineDevicePhoneMobile className="text-xl" />
-            <span className="text-lg">Products</span>
-          </NavLink>
+            <div className="flex items-center gap-4">
+              <HiOutlineDevicePhoneMobile className="text-xl" />
+              <span className="text-lg">Products</span>
+            </div>
+            <HiOutlineChevronDown className={`text-lg transition-transform ${isProductOpen ? "rotate-180" : ""}`} />
+          </div>
 
+          {isProductOpen && (
+            <div className="pl-8">
+              <NavLink
+                to="/products/import"
+                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+              >
+                Add to Stock
+              </NavLink>
+              <NavLink
+                to="/products/confirmStock"
+                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+              >
+                Confirm Stock
+              </NavLink>
+              <NavLink
+                to="/products"
+                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+              >
+                Export Product List
+              </NavLink>
+              
+            </div>
+          )}
+
+          {/* Orders */}
+          
+
+          {/* Categories */}
           <NavLink
-            to="/orders"
-            className={(isActiveObj) =>
-              isActiveObj.isActive ? navActiveClass : navInactiveClass
-            }
+            to="/categories"
+            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
           >
             <HiOutlineTruck className="text-xl" />
-            <span className="text-lg">Orders</span>
+            <span className="text-lg">Categories</span>
           </NavLink>
 
+          {/* Revenue */}
+          <NavLink
+            to="/revenue"
+            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+          >
+            <HiOutlineTruck className="text-xl" />
+            <span className="text-lg">Revenue</span>
+          </NavLink>
+
+          {/* Users */}
           <NavLink
             to="/users"
-            className={(isActiveObj) =>
-              isActiveObj.isActive ? navActiveClass : navInactiveClass
-            }
+            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
           >
             <HiOutlineUser className="text-xl" />
             <span className="text-lg">Users</span>
           </NavLink>
 
+          <NavLink
+            to="/orders"
+            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+          >
+            <HiOutlineTruck className="text-xl" />
+            <span className="text-lg">Orders</span>
+          </NavLink>
+
+          {/* Auth */}
           <div
-            onClick={() => setIsAuthOpen(() => !isAuthOpen)}
+            onClick={() => setIsAuthOpen(!isAuthOpen)}
             className="block flex items-center self-stretch gap-4 py-4 px-6 dark:bg-blackPrimary dark:hover:bg-blackSecondary cursor-pointer max-xl:py-3 dark:text-whiteSecondary hover:bg-white text-blackPrimary bg-whiteSecondary"
           >
             <HiUserGroup className="text-xl" />
@@ -93,19 +133,14 @@ const Sidebar = () => {
           {isAuthOpen && (
             <div>
               {token ? (
-                <div
-                  onClick={handleLogout}  // Gọi handleLogout khi click vào Logout
-                  className={navInactiveClass} // Đặt trực tiếp className
-                >
+                <div onClick={handleLogout} className={navInactiveClass}>
                   <HiLogin className="text-xl" />
                   <span className="text-lg">Logout</span>
                 </div>
               ) : (
                 <NavLink
                   to="/login"
-                  className={(isActiveObj) =>
-                    isActiveObj.isActive ? navActiveClass : navInactiveClass
-                  }
+                  className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
                 >
                   <HiLogin className="text-xl" />
                   <span className="text-lg">Login</span>

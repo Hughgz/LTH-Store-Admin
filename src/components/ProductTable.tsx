@@ -102,6 +102,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                     </div>
                   </div>
                 </td>
+                
                 <td className="py-4 pl-0 pr-4 text-sm leading-6 sm:pr-8 lg:pr-20">
                   <div className="flex items-center gap-x-2 justify-start">
                     <div className={isInStock ? inStockClass : outOfStockClass}>

@@ -17,6 +17,9 @@ import {
   Register,
   Users,
 } from "./pages";
+import Categories from "./pages/Categories";
+import AddToStock from "./pages/AddToStock";
+import ConfirmRequest from "./pages/ConfirmRequest";
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -39,6 +42,14 @@ const router = createBrowserRouter([
         element: <Products />,
       },
       {
+        path: "/products/import",
+        element: <AddToStock />,
+      },
+      {
+        path: "/products/confirmStock",
+        element: <ConfirmRequest />,
+      },
+      {
         path: "/products/create-product",
         element: <CreateProduct />,
       },
@@ -57,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: "/orders/:id",
         element: <EditOrder />,
+      },
+      {
+        path: "/categories",
+        element: <Categories />,
       },
       {
         path: "/users",

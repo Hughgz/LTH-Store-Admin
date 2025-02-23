@@ -1,0 +1,13 @@
+[
+    { "categoryId": "1", "name": "Men's Clothing" },
+    { "categoryId": "2", "name": "Women's Clothing" },
+    { "categoryId": "3", "name": "Kids' Clothing" },
+    { "categoryId": "4", "name": "Footwear" },
+    { "categoryId": "5", "name": "Accessories" },
+    { "categoryId": "6", "name": "Bags & Wallets" },
+    { "categoryId": "7", "name": "Jewelry" },
+    { "categoryId": "8", "name": "Watches" },
+    { "categoryId": "9", "name": "Eyewear" },
+    { "categoryId": "10", "name": "Sportswear" }
+]
+  
