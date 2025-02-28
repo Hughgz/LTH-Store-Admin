@@ -32,13 +32,13 @@ const Revenue = () => {
 
   useEffect(() => {
     dispatch(processRevenueData({ data: revenue.data, filterType: filters.filterType }));
-    setCurrentPage(1); // Reset trang khi dữ liệu thay đổi
+    setCurrentPage(1); 
   }, [revenue.data, filters.filterType, dispatch]);
 
-  // Tính toán số trang
+
   const totalPages = Math.ceil(revenue.filtered.length / ITEMS_PER_PAGE);
 
-  // Lấy dữ liệu hiển thị trên trang hiện tại
+  
   const paginatedData = revenue.filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -83,14 +83,14 @@ const Revenue = () => {
             </button>
           </div>
 
-          {/* Hiển thị lỗi nếu có */}
+        
           {revenue.error && (
             <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
               {revenue.error}
             </div>
           )}
 
-          {/* Bảng hiển thị doanh thu */}
+        
           <div className="overflow-x-auto rounded-lg shadow-md">
             <table className="w-full border-collapse bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
               <thead>
@@ -99,7 +99,7 @@ const Revenue = () => {
                   <th className="p-4 text-left">Revenue</th>
                 </tr>
               </thead>
-              <tbody className="min-h-[250px]"> {/* Đặt chiều cao tối thiểu để tránh layout thay đổi */}
+              <tbody className="min-h-[250px]"> 
                 {revenue.loading ? (
                   <tr>
                     <td colSpan={2} className="p-4 text-center">
@@ -134,7 +134,7 @@ const Revenue = () => {
             </table>
           </div>
 
-          {/* Pagination */}
+        
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-6">
               <button
@@ -163,7 +163,7 @@ const Revenue = () => {
             </div>
           )}
 
-          {/* Hiển thị tổng doanh thu */}
+         
           <div className="mt-6 flex justify-end items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-lg">
             <span className="text-lg font-semibold text-gray-700 dark:text-white mr-4">
               Total Revenue:
