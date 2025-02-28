@@ -10,5 +10,6 @@ export const variables = {
     CART_API: "https://lthshop.azurewebsites.net/api/Carts",
     CART_ITEM_API: "https://lthshop.azurewebsites.net/api/CartItems",
     RECOMMENDATION_API_BUNDLE: "https://lthstore-recommeder-djdnaeh9eudkd4eu.southeastasia-01.azurewebsites.net/bundle-recommendations",
-    RECOMMENDATION: "https://lthstore-recommeder-djdnaeh9eudkd4eu.southeastasia-01.azurewebsites.net/recommendations/"
+    RECOMMENDATION: "https://lthstore-recommeder-djdnaeh9eudkd4eu.southeastasia-01.azurewebsites.net/recommendations/",
+    REVENUE_API: "http://localhost:5049/api/Revenues"
 }

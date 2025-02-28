@@ -20,6 +20,7 @@ import {
 import Categories from "./pages/Categories";
 import AddToStock from "./pages/AddToStock";
 import ConfirmRequest from "./pages/ConfirmRequest";
+import Revenue from "./pages/Revenue";
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -68,6 +69,10 @@ const router = createBrowserRouter([
       {
         path: "/orders/:id",
         element: <EditOrder />,
+      },
+      {
+        path: "/revenue",
+        element: <Revenue />,
       },
       {
         path: "/categories",
