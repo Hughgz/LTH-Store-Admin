@@ -6,14 +6,22 @@ import { RootState, AppDispatch } from "../store";
 import Sidebar from "../components/Sidebar";
 
 const ITEMS_PER_PAGE = 5;
+  const getFirstAndLastDayOfMonth = () => {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(),2);
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
+  return {
+    fromDate: firstDay.toISOString().split("T")[0], // Định dạng YYYY-MM-DD
+    toDate: lastDay.toISOString().split("T")[0],   // Định dạng YYYY-MM-DD
+  };
+};
 const Revenue = () => {
   const dispatch = useDispatch<AppDispatch>();
   const revenue = useSelector((state: RootState) => state.revenue);
   
   const [filters, setFilters] = useState({
-    fromDate: "",
-    toDate: "",
+    ...getFirstAndLastDayOfMonth(),
     filterType: "day",
   });
 
