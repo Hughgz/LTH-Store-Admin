@@ -12,8 +12,8 @@ const ITEMS_PER_PAGE = 5;
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
   return {
-    fromDate: firstDay.toISOString().split("T")[0], // Định dạng YYYY-MM-DD
-    toDate: lastDay.toISOString().split("T")[0],   // Định dạng YYYY-MM-DD
+    fromDate: firstDay.toISOString().split("T")[0], 
+    toDate: lastDay.toISOString().split("T")[0],   
   };
 };
 const Revenue = () => {
