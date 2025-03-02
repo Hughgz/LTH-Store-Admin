@@ -6,14 +6,22 @@ import { RootState, AppDispatch } from "../store";
 import Sidebar from "../components/Sidebar";
 
 const ITEMS_PER_PAGE = 5;
+  const getFirstAndLastDayOfMonth = () => {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(),2);
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
+  return {
+    fromDate: firstDay.toISOString().split("T")[0], 
+    toDate: lastDay.toISOString().split("T")[0],   
+  };
+};
 const Revenue = () => {
   const dispatch = useDispatch<AppDispatch>();
   const revenue = useSelector((state: RootState) => state.revenue);
   
   const [filters, setFilters] = useState({
-    fromDate: "",
-    toDate: "",
+    ...getFirstAndLastDayOfMonth(),
     filterType: "day",
   });
 
@@ -35,7 +43,7 @@ const Revenue = () => {
     setCurrentPage(1); 
   }, [revenue.data, filters.filterType, dispatch]);
 
-
+  
   const totalPages = Math.ceil(revenue.filtered.length / ITEMS_PER_PAGE);
 
   
@@ -51,7 +59,7 @@ const Revenue = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
           <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Revenue Analytics</h1>
 
-          {/* Bộ lọc ngày */}
+         
           <div className="flex flex-wrap gap-4 mb-6">
             <input
               type="date"
@@ -68,7 +76,7 @@ const Revenue = () => {
             <button
               onClick={() => setFilters((p) => ({ ...p, filterType: "day" }))}
               className={`px-4 py-2 border rounded-lg ${
-                filters.filterType === "day" ? "bg-blue-500 text-white" : "text-gray-700 dark:text-gray-300"
+                filters.filterType === "day" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"
               }`}
             >
               Daily
@@ -76,7 +84,7 @@ const Revenue = () => {
             <button
               onClick={() => setFilters((p) => ({ ...p, filterType: "month" }))}
               className={`px-4 py-2 border rounded-lg ${
-                filters.filterType === "month" ? "bg-blue-500 text-white" : "text-gray-700 dark:text-gray-300"
+                filters.filterType === "month" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"
               }`}
             >
               Monthly
@@ -90,7 +98,7 @@ const Revenue = () => {
             </div>
           )}
 
-        
+       
           <div className="overflow-x-auto rounded-lg shadow-md">
             <table className="w-full border-collapse bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
               <thead>
@@ -134,14 +142,14 @@ const Revenue = () => {
             </table>
           </div>
 
-        
+       
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-6">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(currentPage - 1)}
                 className={`px-4 py-2 rounded-lg border ${
-                  currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-white"
+                  currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"
                 }`}
               >
                 Previous
@@ -155,7 +163,7 @@ const Revenue = () => {
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(currentPage + 1)}
                 className={`px-4 py-2 rounded-lg border ${
-                  currentPage === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-white"
+                  currentPage === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"
                 }`}
               >
                 Next
@@ -163,7 +171,7 @@ const Revenue = () => {
             </div>
           )}
 
-         
+       
           <div className="mt-6 flex justify-end items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-lg">
             <span className="text-lg font-semibold text-gray-700 dark:text-white mr-4">
               Total Revenue:
