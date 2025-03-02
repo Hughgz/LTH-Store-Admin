@@ -9,7 +9,7 @@ import { useAuth } from "../utils/hooks/useAuth";
 
 const Sidebar = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isProductOpen, setIsProductOpen] = useState(false); // Dropdown sản phẩm
+  const [isProductOpen, setIsProductOpen] = useState(false);
   const { isSidebarOpen } = useAppSelector((state) => state.dashboard);
   const dispatch = useAppDispatch();
   const { token, logoutUser } = useAuth();

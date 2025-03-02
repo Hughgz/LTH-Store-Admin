@@ -5,6 +5,7 @@ import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 import { AiOutlinePlus } from "react-icons/ai";
 import { AddProductSize } from "../pages";
 import Spinder from "./Spinder";
+import ProductDetailModal from "./ProductDetailModal";
 
 interface ProductSize {
   size: string;
@@ -28,6 +29,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -45,6 +48,20 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   const handleCloseAddProductSizeModal = () => {
     setIsModalOpen(false);
     setSelectedProductId(null);
+  };
+
+  const handleOpenDetailModal = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleDeleteProduct = (productID: string) => {
+    console.log("Delete product", productID);
   };
 
   const inStockClass = "text-green-400 bg-green-400/10 flex-none rounded-full p-1";
@@ -102,7 +119,6 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                     </div>
                   </div>
                 </td>
-                
                 <td className="py-4 pl-0 pr-4 text-sm leading-6 sm:pr-8 lg:pr-20">
                   <div className="flex items-center gap-x-2 justify-start">
                     <div className={isInStock ? inStockClass : outOfStockClass}>
@@ -122,24 +138,28 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                 <td className="py-4 pl-0 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
                   <div className="flex gap-x-1 justify-end">
                     <button
-                      aria-label="Edit Order"
-                      onClick={() => handleOpenAddProductSizeModal(item.productID)}
-                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block justify-center items-center cursor-pointer hover:border-gray-400"
+                      onClick={() => handleOpenDetailModal(item)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                     >
-                      <AiOutlinePlus className="text-lg" />
+                      Xem chi tiết
+                    </button>
+                    <button
+                      onClick={() => handleOpenAddProductSizeModal(item.productID)}
+                      className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+                    >
+                      <AiOutlinePlus />
                     </button>
                     <Link
                       to={`/products/edit/${item.productID}`}
-                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block justify-center items-center cursor-pointer hover:border-gray-400"
+                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                     >
-                      <HiOutlinePencil className="text-lg" />
+                      <HiOutlinePencil />
                     </Link>
                     <button
-                      aria-label="Edit Order"
-                      onClick={() => console.log("Delete product", item.productID)}
-                      className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block justify-center items-center cursor-pointer hover:border-gray-400"
+                      onClick={() => handleDeleteProduct(item.productID)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                     >
-                      <HiOutlineTrash className="text-lg" />
+                      <HiOutlineTrash />
                     </button>
                   </div>
                 </td>
@@ -148,11 +168,14 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
           })}
         </tbody>
       </table>
-      <AddProductSize
-        isModalOpen={isModalOpen}
-        closeModal={handleCloseAddProductSizeModal}
-        productID={selectedProductId}
+
+      <ProductDetailModal
+        isModalOpen={isDetailModalOpen}
+        closeModal={handleCloseDetailModal}
+        selectedProduct={selectedProduct}
       />
+
+      <AddProductSize isModalOpen={isModalOpen} closeModal={handleCloseAddProductSizeModal} productID={selectedProductId} />
     </>
   );
 };
