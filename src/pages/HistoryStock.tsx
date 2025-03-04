@@ -1,44 +1,38 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStockHistoryByProductSizeId, fetchStockHistoryByPeriod } from "../redux/actions/historyStockAction";
+import { RootState, AppDispatch } from "../store";
 import Sidebar from "../components/Sidebar";
 
 const ITEMS_PER_PAGE = 5;
 
 const HistoryStock = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const stockHistory = useSelector((state: RootState) => state.historyStock);
+  
   const [filters, setFilters] = useState({
     productSizeId: "",
     fromDate: "",
     toDate: "",
   });
-
-  const [currentPage, setCurrentPage] = useState(1);
-  interface StockHistoryItem {
-    StockHistoryID: number;
-    UpdatedDateTime: string;
-    ProductSizeID: number;
-    StockChange: number;
-    Note?: string;
-  }
   
-  const [stockHistory, setStockHistory] = useState<{ data: StockHistoryItem[]; loading: boolean }>({ data: [], loading: false });
-
-  const fetchStockHistory = async () => {
-    if (!filters.productSizeId || !filters.fromDate || !filters.toDate) return;
-    setStockHistory((prev) => ({ ...prev, loading: true }));
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/StockHistories?productSizeId=${filters.productSizeId}&fromDate=${filters.fromDate}&toDate=${filters.toDate}`
-      );
-      const data = await response.json();
-      setStockHistory({ data, loading: false });
-    } catch (error) {
-      console.error("Error fetching stock history:", error);
-      setStockHistory((prev) => ({ ...prev, loading: false }));
-    }
-  };
+  const [currentPage, setCurrentPage] = useState(1);
+  const [applyFilter, setApplyFilter] = useState(false);
 
   useEffect(() => {
-    fetchStockHistory();
-  }, [filters]);
+    if (applyFilter) {
+      if (filters.fromDate && filters.toDate) {
+        dispatch(fetchStockHistoryByPeriod({
+          productSizeId: Number(filters.productSizeId),
+          fromDate: filters.fromDate,
+          toDate: filters.toDate,
+        }));
+      } else {
+        dispatch(fetchStockHistoryByProductSizeId(Number(filters.productSizeId)));
+      }
+      setApplyFilter(false);
+    }
+  }, [applyFilter, dispatch, filters]);
 
   const totalPages = Math.ceil(stockHistory.data.length / ITEMS_PER_PAGE);
 
@@ -74,6 +68,12 @@ const HistoryStock = () => {
               onChange={(e) => setFilters((p) => ({ ...p, toDate: e.target.value }))}
               className="border rounded-lg px-3 py-2 text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
             />
+            <button
+              onClick={() => setApplyFilter(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            >
+              Filter
+            </button>
           </div>
 
           {stockHistory.loading ? (
@@ -110,34 +110,6 @@ const HistoryStock = () => {
                   )}
                 </tbody>
               </table>
-            </div>
-          )}
-
-          {totalPages > 1 && (
-            <div className="flex justify-between items-center mt-6">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-                className={`px-4 py-2 rounded-lg border ${
-                  currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"
-                }`}
-              >
-                Previous
-              </button>
-
-              <span className="text-gray-700 dark:text-gray-300">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
-                className={`px-4 py-2 rounded-lg border ${
-                  currentPage === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"
-                }`}
-              >
-                Next
-              </button>
             </div>
           )}
         </div>
