@@ -4,8 +4,9 @@ import userReducer from "./userSlice"
 import authReducer from './authSlice'
 import dashboardReducer from "../../features/dashboard/dashboardSlice";
 import darkModeReducer from "../../features/darkMode/darkModeSlice";
-import revenueReducer from "./revenueSlice"
-import historyStockReduce from "./historyStockSlice"
+import revenueReducer from "./revenueSlice";
+import historyStockReducer from "./historyStockSlice";
+import orderReducer from "./orderSlice";
 const rootReducer = combineReducers({
   product: productReducer,
   user: userReducer,
@@ -13,7 +14,8 @@ const rootReducer = combineReducers({
   dashboard: dashboardReducer,
   darkMode: darkModeReducer,
   revenue: revenueReducer,
-  historyStock: historyStockReduce,
+  historyStock: historyStockReducer,
+  order: orderReducer,
 });
 
 export default rootReducer;

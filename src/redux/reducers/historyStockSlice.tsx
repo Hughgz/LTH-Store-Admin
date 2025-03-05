@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchStockHistoryByProductSizeId, fetchStockHistoryByPeriod } from "../actions/historyStockAction";
+import { fetchStockHistoryByProductSizeId, fetchStockHistoryByProductSizeIdAndPeriod } from "../actions/historyStockAction";
 
 interface StockHistoryData {
   StockHistoryID: number;
@@ -11,12 +11,16 @@ interface StockHistoryData {
 
 interface StockHistoryState {
   data: StockHistoryData[];
+  filtered: StockHistoryData[];
+  total: number;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: StockHistoryState = {
   data: [],
+  filtered: [],
+  total: 0,
   loading: false,
   error: null,
 };
@@ -24,7 +28,24 @@ const initialState: StockHistoryState = {
 const stockHistorySlice = createSlice({
   name: "stockHistory",
   initialState,
-  reducers: {},
+  reducers: {
+    processStockHistoryData: (state, action) => {
+      const { data } = action.payload;
+
+      if (!data.length) {
+        state.filtered = [];
+        state.total = 0;
+        return;
+      }
+
+      const processed = data.sort(
+        (a: { UpdatedDateTime: string | number | Date; }, b: { UpdatedDateTime: string | number | Date; }) => new Date(a.UpdatedDateTime).getTime() - new Date(b.UpdatedDateTime).getTime()
+      );
+
+      state.filtered = processed;
+      state.total = processed.reduce((sum: any, item: { StockChange: any; }) => sum + item.StockChange, 0);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchStockHistoryByProductSizeId.pending, (state) => {
@@ -37,21 +58,22 @@ const stockHistorySlice = createSlice({
       })
       .addCase(fetchStockHistoryByProductSizeId.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to fetch stock history";
+        state.error = action.error.message || "Failed to fetch stock history data";
       })
-      .addCase(fetchStockHistoryByPeriod.pending, (state) => {
+      .addCase(fetchStockHistoryByProductSizeIdAndPeriod.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchStockHistoryByPeriod.fulfilled, (state, action) => {
+      .addCase(fetchStockHistoryByProductSizeIdAndPeriod.fulfilled, (state, action) => {
         state.data = action.payload;
         state.loading = false;
       })
-      .addCase(fetchStockHistoryByPeriod.rejected, (state, action) => {
+      .addCase(fetchStockHistoryByProductSizeIdAndPeriod.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to fetch stock history";
+        state.error = action.error.message || "Failed to fetch stock history data";
       });
   },
 });
 
+export const { processStockHistoryData } = stockHistorySlice.actions;
 export default stockHistorySlice.reducer;

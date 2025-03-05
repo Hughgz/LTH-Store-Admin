@@ -19,8 +19,8 @@ const UpdateOrderModal: FC<ModalProps> = ({ isModalOpen, closeModal, orderId, cu
     }
 
     try {
-      const response = await fetch(`https://lthshop.azurewebsites.net/api/Orders/${orderId}`, {
-        method: "PUT",
+      const response = await fetch(`http://localhost:5049/api/Orders/confirm-deliver/${orderId}`, {
+        method: "POST", // trước đây là PUT, Tai thay đổi POST
         headers: {
           "Content-Type": "application/json",
         },

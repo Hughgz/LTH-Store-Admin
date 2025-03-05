@@ -8,9 +8,13 @@ export const fetchStockHistoryByProductSizeId = createAsyncThunk(
   }
 );
 
-export const fetchStockHistoryByPeriod = createAsyncThunk(
-  "stockHistory/fetchByPeriod",
-  async (params: { productSizeId: number; fromDate: string; toDate: string }) => {
-    return await stockHistoryApi.fetchByPeriod(params);
+export const fetchStockHistoryByProductSizeIdAndPeriod = createAsyncThunk(
+  "stockHistory/fetchByProductSizeIdAndPeriod",
+  async (params: { productSizeId?: number; startDate?: Date; endDate?: Date }) => {
+    return await stockHistoryApi.fetchByProductSizeIdAndPeriod(
+      params.productSizeId,
+      params.startDate,
+      params.endDate
+    );
   }
 );

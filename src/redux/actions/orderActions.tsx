@@ -8,3 +8,12 @@ export const fetchOrders = createAsyncThunk(
     return orders;
   }
 );
+
+export const confirmOrderDelivery = createAsyncThunk(
+  'orders/confirmOrderDelivery',
+  async (orderId: string) => {
+    const response = await orderApi.confirmDelivery(orderId);
+    console.log(response);
+    return response;  
+  }
+);

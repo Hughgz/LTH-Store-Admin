@@ -1,41 +1,44 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStockHistoryByProductSizeId, fetchStockHistoryByPeriod } from "../redux/actions/historyStockAction";
+import { fetchStockHistoryByProductSizeId, fetchStockHistoryByProductSizeIdAndPeriod } from "../redux/actions/historyStockAction";
 import { RootState, AppDispatch } from "../store";
 import Sidebar from "../components/Sidebar";
 
 const ITEMS_PER_PAGE = 5;
 
-const HistoryStock = () => {
+const StockHistory = () => {
   const dispatch = useDispatch<AppDispatch>();
   const stockHistory = useSelector((state: RootState) => state.historyStock);
-  
+
   const [filters, setFilters] = useState({
     productSizeId: "",
-    fromDate: "",
-    toDate: "",
+    startDate: "",
+    endDate: "",
   });
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [applyFilter, setApplyFilter] = useState(false);
 
+  // Effect to fetch data based on the filters
   useEffect(() => {
     if (applyFilter) {
-      if (filters.fromDate && filters.toDate) {
-        dispatch(fetchStockHistoryByPeriod({
+      if (filters.startDate && filters.endDate) {
+        // If both startDate and endDate are provided, call the API with the period filter
+        dispatch(fetchStockHistoryByProductSizeIdAndPeriod({
           productSizeId: Number(filters.productSizeId),
-          fromDate: filters.fromDate,
-          toDate: filters.toDate,
+          startDate: new Date(filters.startDate),
+          endDate: new Date(filters.endDate),
         }));
-      } else {
+      } else if (filters.productSizeId) {
+        // If only productSizeId is provided, call the API with productSizeId filter
         dispatch(fetchStockHistoryByProductSizeId(Number(filters.productSizeId)));
       }
-      setApplyFilter(false);
+      setApplyFilter(false); // Reset the apply filter flag after dispatch
     }
   }, [applyFilter, dispatch, filters]);
 
+  // Pagination calculation
   const totalPages = Math.ceil(stockHistory.data.length / ITEMS_PER_PAGE);
-
   const paginatedData = stockHistory.data.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -53,23 +56,23 @@ const HistoryStock = () => {
               type="number"
               placeholder="Product Size ID"
               value={filters.productSizeId}
-              onChange={(e) => setFilters((p) => ({ ...p, productSizeId: e.target.value }))}
+              onChange={(e) => setFilters({ ...filters, productSizeId: e.target.value })}
               className="border rounded-lg px-3 py-2 text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
             />
             <input
               type="date"
-              value={filters.fromDate}
-              onChange={(e) => setFilters((p) => ({ ...p, fromDate: e.target.value }))}
+              value={filters.startDate}
+              onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
               className="border rounded-lg px-3 py-2 text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
             />
             <input
               type="date"
-              value={filters.toDate}
-              onChange={(e) => setFilters((p) => ({ ...p, toDate: e.target.value }))}
+              value={filters.endDate}
+              onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
               className="border rounded-lg px-3 py-2 text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
             />
             <button
-              onClick={() => setApplyFilter(true)}
+              onClick={() => setApplyFilter(true)} // Trigger filter application
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
             >
               Filter
@@ -78,6 +81,8 @@ const HistoryStock = () => {
 
           {stockHistory.loading ? (
             <p className="text-center">Loading...</p>
+          ) : stockHistory.error ? (
+            <p className="text-center text-red-500">{stockHistory.error}</p>
           ) : (
             <div className="overflow-x-auto rounded-lg shadow-md">
               <table className="w-full border-collapse bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
@@ -92,8 +97,8 @@ const HistoryStock = () => {
                 </thead>
                 <tbody>
                   {paginatedData.length > 0 ? (
-                    paginatedData.map((item, index) => (
-                      <tr key={`${item.StockHistoryID}-${index}`} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-opacity opacity-100">
+                    paginatedData.map((item) => (
+                      <tr key={item.StockHistoryID} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td className="p-4">{item.StockHistoryID}</td>
                         <td className="p-4">{new Date(item.UpdatedDateTime).toLocaleString()}</td>
                         <td className="p-4">{item.ProductSizeID}</td>
@@ -112,10 +117,39 @@ const HistoryStock = () => {
               </table>
             </div>
           )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-between items-center mt-6">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+                className={`px-4 py-2 rounded-lg border ${
+                  currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"
+                }`}
+              >
+                Previous
+              </button>
+
+              <span className="text-gray-700 dark:text-gray-300">
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+                className={`px-4 py-2 rounded-lg border ${
+                  currentPage === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default HistoryStock;
+export default StockHistory;
