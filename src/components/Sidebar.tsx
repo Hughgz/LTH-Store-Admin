@@ -79,7 +79,13 @@ const Sidebar = () => {
               >
                 Export Product List
               </NavLink>
-              
+              <NavLink
+                to="/products/historyStock"
+                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+              >
+                History Stock
+              </NavLink>
+
             </div>
           )}
 

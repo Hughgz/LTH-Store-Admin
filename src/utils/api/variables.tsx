@@ -13,5 +13,6 @@ export const variables = {
 
     RECOMMENDATION_API_BUNDLE: "https://lthstore-recommeder-djdnaeh9eudkd4eu.southeastasia-01.azurewebsites.net/bundle-recommendations",
     RECOMMENDATION: "https://lthstore-recommeder-djdnaeh9eudkd4eu.southeastasia-01.azurewebsites.net/recommendations/",
-    REVENUE_API: "http://localhost:5049/api/Revenues"
+    REVENUE_API: "http://localhost:5049/api/Revenues",
+    HISTORYSTOCK_API: "http://localhost:5049/api/StockHistories",
 }
