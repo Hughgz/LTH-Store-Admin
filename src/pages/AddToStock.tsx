@@ -97,19 +97,19 @@ const AddToStock: React.FC = () => {
       setSizeError(`Product "${product.name}" does not have any sizes available.`);
       return;
     }
-  
+
     // 🛠 Kiểm tra xem sản phẩm đã tồn tại hay chưa (cho phép nếu chưa chọn size)
     const isDuplicate = selectedProducts.some(
       (item) => item.product.productID === product.productID && item.size !== ""
     );
-  
+
     if (isDuplicate) {
       setSizeError(`Product "${product.name}" is already in the list. Please select a different size.`);
       return;
     }
-  
+
     setSizeError(null);
-  
+
     setSelectedProducts([
       ...selectedProducts,
       {
@@ -121,9 +121,9 @@ const AddToStock: React.FC = () => {
       },
     ]);
   };
-  
-  
-  
+
+
+
 
   const handleSupplierChange = (index: number, supplierId: number) => {
     setSelectedProducts((prev) =>
@@ -143,6 +143,18 @@ const AddToStock: React.FC = () => {
     );
   };
 
+  const handleQuantityChange = (index: number, newQuantity: number) => {
+    if (newQuantity < 1) {
+      alert("Quantity must be at least 1.");
+      return;
+    }
+
+    setSelectedProducts((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
 
   const handleSubmitStock = async () => {
     const hasInvalidSize = selectedProducts.some((item) => item.size === "");
@@ -166,7 +178,7 @@ const AddToStock: React.FC = () => {
         const selectedProductSize = item.product.productSizes.find((size) => size.size === item.size);
         return {
           productSizeID: selectedProductSize?.productSizeID || 0,
-          quantity: selectedProductSize?.stockQuantity || 0,
+          quantity: item.quantity,
           unit: "piece",
           rawPrice: item.price,
         };
@@ -186,25 +198,25 @@ const AddToStock: React.FC = () => {
     // 🛠 Kiểm tra nếu size đã tồn tại cho sản phẩm khác
     const isSizeDuplicate = selectedProducts.some(
       (item, i) =>
-        i !== index && 
+        i !== index &&
         item.product.productID === selectedProducts[index].product.productID &&
         item.size === newSize
     );
-  
+
     if (isSizeDuplicate) {
       alert("This size is already selected for this product. Please choose another size.");
       return;
     }
-  
+
     setSelectedProducts((prev) =>
       prev.map((p, i) => {
         if (i === index) {
           const selectedSize = p.product.productSizes.find((size) => size.size === newSize);
-  
+
           return {
             ...p,
             size: newSize,
-            stockQuantity: selectedSize ? selectedSize.stockQuantity : 0, 
+            stockQuantity: selectedSize ? selectedSize.stockQuantity : 0,
             price: selectedSize?.productPrices?.[0]?.sellingPrice || 0,
           };
         }
@@ -212,8 +224,8 @@ const AddToStock: React.FC = () => {
       })
     );
   };
-  
-  
+
+
 
   return (
     <div className="h-auto border-t border-blackSecondary flex dark:bg-blackPrimary bg-whiteSecondary">
@@ -269,7 +281,15 @@ const AddToStock: React.FC = () => {
                             onChange={(e) => handleSizeChange(index, Number(e.target.value))}
                           />
                         </td>
-                        <td className="border p-2 text-center">{item.quantity}</td>
+                        <td className="border p-2">
+                          <SimpleInput
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) => handleQuantityChange(index, Number(e.target.value))}
+                            className="w-full text-center"
+                          />
+                        </td>                        
                         <td className="border p-2">
                           <SimpleInput
                             type="number"
