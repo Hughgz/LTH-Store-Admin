@@ -13,7 +13,7 @@ const stockHistoryApi = {
   // Lấy lịch sử tồn kho theo productSizeId
   fetchByProductSizeId: async (productSizeId: number): Promise<StockHistoryData[]> => {
     const response = await axios.get<StockHistoryData[]>(`${variables.HISTORYSTOCK_API}/${productSizeId}`);
-    console.log(response.data);
+    console.log('API Response',response.data);
     return response.data;
   },
 
@@ -25,7 +25,8 @@ const stockHistoryApi = {
       endDate: endDate?.toISOString(),
     };
 
-    const response = await axios.get<StockHistoryData[]>(variables.HISTORYSTOCK_API, { params });
+    const response = await axios.get<StockHistoryData[]>(variables.HISTORYSTOCK_API,{ params });
+    console.log("API Response with Filters:", response.data);
     return response.data;
   },
 };

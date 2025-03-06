@@ -26,7 +26,7 @@ const initialState: StockHistoryState = {
 };
 
 const stockHistorySlice = createSlice({
-  name: "stockHistory",
+  name: "historyStock",
   initialState,
   reducers: {
     processStockHistoryData: (state, action) => {
@@ -54,6 +54,7 @@ const stockHistorySlice = createSlice({
       })
       .addCase(fetchStockHistoryByProductSizeId.fulfilled, (state, action) => {
         state.data = action.payload;
+        state.filtered = action.payload; 
         state.loading = false;
       })
       .addCase(fetchStockHistoryByProductSizeId.rejected, (state, action) => {
@@ -66,6 +67,7 @@ const stockHistorySlice = createSlice({
       })
       .addCase(fetchStockHistoryByProductSizeIdAndPeriod.fulfilled, (state, action) => {
         state.data = action.payload;
+        state.filtered = action.payload; 
         state.loading = false;
       })
       .addCase(fetchStockHistoryByProductSizeIdAndPeriod.rejected, (state, action) => {

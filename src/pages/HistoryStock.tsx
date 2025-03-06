@@ -6,40 +6,46 @@ import Sidebar from "../components/Sidebar";
 
 const ITEMS_PER_PAGE = 5;
 
-const StockHistory = () => {
+const HistoryStock = () => {
   const dispatch = useDispatch<AppDispatch>();
   const stockHistory = useSelector((state: RootState) => state.historyStock);
-
+  useEffect(() => {
+    console.log("Stock History Data:", stockHistory);
+  }, [stockHistory]);
   const [filters, setFilters] = useState({
     productSizeId: "",
     startDate: "",
     endDate: "",
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [applyFilter, setApplyFilter] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Effect to fetch data based on the filters
   useEffect(() => {
+    console.log("applyFilter:", applyFilter);
+    console.log("filters:", filters);
+    console.log("dispatch:", dispatch);
+
     if (applyFilter) {
+      console.log("Apply Filter is true");
       if (filters.startDate && filters.endDate) {
-        // If both startDate and endDate are provided, call the API with the period filter
+        console.log("Fetching stock history by period:", filters);
         dispatch(fetchStockHistoryByProductSizeIdAndPeriod({
           productSizeId: Number(filters.productSizeId),
           startDate: new Date(filters.startDate),
           endDate: new Date(filters.endDate),
         }));
       } else if (filters.productSizeId) {
-        // If only productSizeId is provided, call the API with productSizeId filter
+        console.log("Fetching stock history by productSizeId:", filters.productSizeId);
         dispatch(fetchStockHistoryByProductSizeId(Number(filters.productSizeId)));
       }
-      setApplyFilter(false); // Reset the apply filter flag after dispatch
+      setApplyFilter(false); // Reset trạng thái áp dụng filter
     }
   }, [applyFilter, dispatch, filters]);
 
-  // Pagination calculation
-  const totalPages = Math.ceil(stockHistory.data.length / ITEMS_PER_PAGE);
-  const paginatedData = stockHistory.data.slice(
+  const totalPages = Math.ceil(stockHistory.filtered.length / ITEMS_PER_PAGE);
+
+  const paginatedData = stockHistory.filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
@@ -53,72 +59,93 @@ const StockHistory = () => {
 
           <div className="flex flex-wrap gap-4 mb-6">
             <input
-              type="number"
-              placeholder="Product Size ID"
+              type="text"
               value={filters.productSizeId}
-              onChange={(e) => setFilters({ ...filters, productSizeId: e.target.value })}
+              onChange={(e) => setFilters((p) => ({ ...p, productSizeId: e.target.value }))}
+              placeholder="Product Size ID"
               className="border rounded-lg px-3 py-2 text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
             />
             <input
               type="date"
               value={filters.startDate}
-              onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+              onChange={(e) => setFilters((p) => ({ ...p, startDate: e.target.value }))}
               className="border rounded-lg px-3 py-2 text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
             />
             <input
               type="date"
               value={filters.endDate}
-              onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+              onChange={(e) => setFilters((p) => ({ ...p, endDate: e.target.value }))}
               className="border rounded-lg px-3 py-2 text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
             />
             <button
-              onClick={() => setApplyFilter(true)} // Trigger filter application
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              onClick={() => setApplyFilter(true)}
+              className="px-4 py-2 border rounded-lg bg-gray-500 text-white"
             >
-              Filter
+              Apply Filters
             </button>
           </div>
 
-          {stockHistory.loading ? (
-            <p className="text-center">Loading...</p>
-          ) : stockHistory.error ? (
-            <p className="text-center text-red-500">{stockHistory.error}</p>
-          ) : (
-            <div className="overflow-x-auto rounded-lg shadow-md">
-              <table className="w-full border-collapse bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                <thead>
-                  <tr className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-                    <th className="p-4 text-left">Stock History ID</th>
-                    <th className="p-4 text-left">Updated Date</th>
-                    <th className="p-4 text-left">Product Size ID</th>
-                    <th className="p-4 text-left">Stock Change</th>
-                    <th className="p-4 text-left">Note</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedData.length > 0 ? (
-                    paginatedData.map((item) => (
-                      <tr key={item.StockHistoryID} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <td className="p-4">{item.StockHistoryID}</td>
-                        <td className="p-4">{new Date(item.UpdatedDateTime).toLocaleString()}</td>
-                        <td className="p-4">{item.ProductSizeID}</td>
-                        <td className="p-4">{item.StockChange}</td>
-                        <td className="p-4">{item.Note || "N/A"}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="p-4 text-center text-gray-500">
-                        No stock history available for the selected period.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+
+          {stockHistory.error && (
+            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              {stockHistory.error}
             </div>
           )}
 
-          {/* Pagination Controls */}
+   
+          <div className="overflow-x-auto rounded-lg shadow-md">
+            <table className="w-full border-collapse bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+              <thead>
+                <tr className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                  <th className="p-4 text-left">Stock History ID</th>
+                  <th className="p-4 text-left">Updated Date</th>
+                  <th className="p-4 text-left">Product Size ID</th>
+                  <th className="p-4 text-left">Stock Change</th>
+                  <th className="p-4 text-left">Note</th>
+                </tr>
+              </thead>
+              <tbody className="min-h-[250px]">
+                {stockHistory.loading ? (
+                  <tr>
+                    <td colSpan={5} className="p-4 text-center">
+                      <div className="flex justify-center items-center space-x-2">
+                        {[...Array(3)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="w-4 h-4 rounded-full bg-blue-500 animate-pulse"
+                            style={{ animationDelay: `${i * 75}ms` }}
+                          />
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ) : stockHistory.error ? (
+                  <tr>
+                    <td colSpan={5} className="p-4 text-center text-red-500">
+                      {stockHistory.error}
+                    </td>
+                  </tr>
+                ) : paginatedData.length > 0 ? (
+                  paginatedData.map((item) => (
+                    <tr key={item.StockHistoryID} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="p-4">{item.StockHistoryID}</td>
+                      <td className="p-4">{new Date(item.UpdatedDateTime).toLocaleString()}</td>
+                      <td className="p-4">{item.ProductSizeID}</td>
+                      <td className="p-4">{item.StockChange}</td>
+                      <td className="p-4">{item.Note || "N/A"}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="p-4 text-center text-gray-500">
+                      No stock history available for the selected period.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-6">
               <button
@@ -146,10 +173,13 @@ const StockHistory = () => {
               </button>
             </div>
           )}
+
+    
+  
         </div>
       </div>
     </div>
   );
 };
 
-export default StockHistory;
+export default HistoryStock;
