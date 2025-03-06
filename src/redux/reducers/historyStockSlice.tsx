@@ -3,7 +3,7 @@ import { fetchStockHistoryByProductSizeId, fetchStockHistoryByProductSizeIdAndPe
 
 interface StockHistoryData {
   StockHistoryID: number;
-  UpdatedDateTime: string;
+  UpdatedDateTime: string;  // Dữ liệu này sẽ được lấy nguyên vẹn từ backend
   ProductSizeID: number;
   StockChange: number;
   Note?: string;
@@ -32,18 +32,14 @@ const stockHistorySlice = createSlice({
     processStockHistoryData: (state, action) => {
       const { data } = action.payload;
 
+      // Kiểm tra nếu không có dữ liệu, làm sạch filtered và total
       if (!data.length) {
         state.filtered = [];
         state.total = 0;
         return;
       }
 
-      const processed = data.sort(
-        (a: { UpdatedDateTime: string | number | Date; }, b: { UpdatedDateTime: string | number | Date; }) => new Date(a.UpdatedDateTime).getTime() - new Date(b.UpdatedDateTime).getTime()
-      );
 
-      state.filtered = processed;
-      state.total = processed.reduce((sum: any, item: { StockChange: any; }) => sum + item.StockChange, 0);
     },
   },
   extraReducers: (builder) => {
@@ -54,7 +50,7 @@ const stockHistorySlice = createSlice({
       })
       .addCase(fetchStockHistoryByProductSizeId.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.filtered = action.payload; 
+        state.filtered = action.payload;  // Cập nhật filtered với dữ liệu trả về từ API
         state.loading = false;
       })
       .addCase(fetchStockHistoryByProductSizeId.rejected, (state, action) => {
@@ -67,7 +63,7 @@ const stockHistorySlice = createSlice({
       })
       .addCase(fetchStockHistoryByProductSizeIdAndPeriod.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.filtered = action.payload; 
+        state.filtered = action.payload;  // Cập nhật filtered với dữ liệu trả về từ API
         state.loading = false;
       })
       .addCase(fetchStockHistoryByProductSizeIdAndPeriod.rejected, (state, action) => {

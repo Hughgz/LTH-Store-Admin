@@ -129,10 +129,10 @@ const HistoryStock = () => {
                   paginatedData.map((item) => (
                     <tr key={item.StockHistoryID} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="p-4">{item.StockHistoryID}</td>
-                      <td className="p-4">{new Date(item.UpdatedDateTime).toLocaleString()}</td>
+                      <td className="p-4">{item.UpdatedDateTime}</td>
                       <td className="p-4">{item.ProductSizeID}</td>
                       <td className="p-4">{item.StockChange}</td>
-                      <td className="p-4">{item.Note || "N/A"}</td>
+                      <td className="p-4">{item.Note}</td>
                     </tr>
                   ))
                 ) : (
