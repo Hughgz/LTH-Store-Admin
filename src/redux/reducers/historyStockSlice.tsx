@@ -2,11 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchStockHistoryByProductSizeId, fetchStockHistoryByProductSizeIdAndPeriod } from "../actions/historyStockAction";
 
 interface StockHistoryData {
-  StockHistoryID: number;
-  UpdatedDateTime: string;  // Dữ liệu này sẽ được lấy nguyên vẹn từ backend
-  ProductSizeID: number;
-  StockChange: number;
-  Note?: string;
+  stockHistoryID: number;
+  updatedDateTime: string;  
+  productSizeID: number;
+  stockChange: number;
+  note?: string;
 }
 
 interface StockHistoryState {
@@ -32,7 +32,7 @@ const stockHistorySlice = createSlice({
     processStockHistoryData: (state, action) => {
       const { data } = action.payload;
 
-      // Kiểm tra nếu không có dữ liệu, làm sạch filtered và total
+     
       if (!data.length) {
         state.filtered = [];
         state.total = 0;
@@ -50,7 +50,7 @@ const stockHistorySlice = createSlice({
       })
       .addCase(fetchStockHistoryByProductSizeId.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.filtered = action.payload;  // Cập nhật filtered với dữ liệu trả về từ API
+        state.filtered = action.payload; 
         state.loading = false;
       })
       .addCase(fetchStockHistoryByProductSizeId.rejected, (state, action) => {
@@ -63,7 +63,7 @@ const stockHistorySlice = createSlice({
       })
       .addCase(fetchStockHistoryByProductSizeIdAndPeriod.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.filtered = action.payload;  // Cập nhật filtered với dữ liệu trả về từ API
+        state.filtered = action.payload; 
         state.loading = false;
       })
       .addCase(fetchStockHistoryByProductSizeIdAndPeriod.rejected, (state, action) => {

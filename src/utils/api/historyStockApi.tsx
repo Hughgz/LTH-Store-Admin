@@ -2,11 +2,11 @@ import axios from "axios";
 import { variables } from "./variables"; 
 
 interface StockHistoryData {
-  StockHistoryID: number;
-  UpdatedDateTime: string;
-  ProductSizeID: number;
-  StockChange: number;
-  Note?: string;
+  stockHistoryID: number;
+  updatedDateTime: string;
+  productSizeID: number;
+  stockChange: number;
+  note?: string;
 }
 
 const stockHistoryApi = {

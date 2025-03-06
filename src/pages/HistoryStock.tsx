@@ -9,9 +9,12 @@ const ITEMS_PER_PAGE = 5;
 const HistoryStock = () => {
   const dispatch = useDispatch<AppDispatch>();
   const stockHistory = useSelector((state: RootState) => state.historyStock);
+
+
   useEffect(() => {
     console.log("Stock History Data:", stockHistory);
   }, [stockHistory]);
+
   const [filters, setFilters] = useState({
     productSizeId: "",
     startDate: "",
@@ -24,7 +27,6 @@ const HistoryStock = () => {
   useEffect(() => {
     console.log("applyFilter:", applyFilter);
     console.log("filters:", filters);
-    console.log("dispatch:", dispatch);
 
     if (applyFilter) {
       console.log("Apply Filter is true");
@@ -39,11 +41,13 @@ const HistoryStock = () => {
         console.log("Fetching stock history by productSizeId:", filters.productSizeId);
         dispatch(fetchStockHistoryByProductSizeId(Number(filters.productSizeId)));
       }
-      setApplyFilter(false); // Reset trạng thái áp dụng filter
+      setApplyFilter(false); 
     }
   }, [applyFilter, dispatch, filters]);
 
+
   const totalPages = Math.ceil(stockHistory.filtered.length / ITEMS_PER_PAGE);
+
 
   const paginatedData = stockHistory.filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -56,6 +60,7 @@ const HistoryStock = () => {
       <div className="flex-1 p-6 overflow-auto">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
           <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Stock History</h1>
+
 
           <div className="flex flex-wrap gap-4 mb-6">
             <input
@@ -78,21 +83,20 @@ const HistoryStock = () => {
               className="border rounded-lg px-3 py-2 text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
             />
             <button
-              onClick={() => setApplyFilter(true)}
+              onClick={() => setApplyFilter(true)} 
               className="px-4 py-2 border rounded-lg bg-gray-500 text-white"
             >
               Apply Filters
             </button>
           </div>
 
-
+  
           {stockHistory.error && (
             <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
               {stockHistory.error}
             </div>
           )}
 
-   
           <div className="overflow-x-auto rounded-lg shadow-md">
             <table className="w-full border-collapse bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
               <thead>
@@ -127,12 +131,12 @@ const HistoryStock = () => {
                   </tr>
                 ) : paginatedData.length > 0 ? (
                   paginatedData.map((item) => (
-                    <tr key={item.StockHistoryID} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="p-4">{item.StockHistoryID}</td>
-                      <td className="p-4">{item.UpdatedDateTime}</td>
-                      <td className="p-4">{item.ProductSizeID}</td>
-                      <td className="p-4">{item.StockChange}</td>
-                      <td className="p-4">{item.Note}</td>
+                    <tr key={item.stockHistoryID} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="p-4">{item.stockHistoryID}</td>
+                      <td className="p-4">{item.updatedDateTime}</td>
+                      <td className="p-4">{item.productSizeID}</td>
+                      <td className="p-4">{item.stockChange}</td>
+                      <td className="p-4">{item.note || "N/A"}</td>
                     </tr>
                   ))
                 ) : (
@@ -146,14 +150,13 @@ const HistoryStock = () => {
             </table>
           </div>
 
+          {/* Phân trang */}
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-6">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(currentPage - 1)}
-                className={`px-4 py-2 rounded-lg border ${
-                  currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"
-                }`}
+                className={`px-4 py-2 rounded-lg border ${currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"}`}
               >
                 Previous
               </button>
@@ -165,17 +168,12 @@ const HistoryStock = () => {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(currentPage + 1)}
-                className={`px-4 py-2 rounded-lg border ${
-                  currentPage === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"
-                }`}
+                className={`px-4 py-2 rounded-lg border ${currentPage === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"}`}
               >
                 Next
               </button>
             </div>
           )}
-
-    
-  
         </div>
       </div>
     </div>
