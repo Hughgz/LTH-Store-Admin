@@ -67,6 +67,12 @@ const deleteOrder = async (orderId: string): Promise<void> => {
   await axios.delete(`${API_URL}/${orderId}`);
 };
 
+const confirmDelivery = async (orderId: string): Promise<string> => {
+  const response = await axios.post(`${API_URL}/confirm-deliver/${orderId}`);
+  return response.data;
+};
+
+
 export default {
   getOrders,
   getOrdersByUserId,
@@ -75,4 +81,5 @@ export default {
   createOrderVnPay,
   updateOrder,
   deleteOrder,
+  confirmDelivery,
 };

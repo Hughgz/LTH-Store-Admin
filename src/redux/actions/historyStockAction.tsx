@@ -2,15 +2,21 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import stockHistoryApi from "../../utils/api/historyStockApi";
 
 export const fetchStockHistoryByProductSizeId = createAsyncThunk(
-  "stockHistory/fetchByProductSizeId",
+  "historyStock/fetchByProductSizeId",
   async (productSizeId: number) => {
-    return await stockHistoryApi.fetchByProductSizeId(productSizeId);
+    const data = await stockHistoryApi.fetchByProductSizeId(productSizeId);
+    return data; 
   }
 );
 
-export const fetchStockHistoryByPeriod = createAsyncThunk(
-  "stockHistory/fetchByPeriod",
-  async (params: { productSizeId: number; fromDate: string; toDate: string }) => {
-    return await stockHistoryApi.fetchByPeriod(params);
+export const fetchStockHistoryByProductSizeIdAndPeriod = createAsyncThunk(
+  "historyStock/fetchByProductSizeIdAndPeriod",
+  async (params: { productSizeId?: number; startDate?: Date; endDate?: Date }) => {
+    const data = await stockHistoryApi.fetchByProductSizeIdAndPeriod(
+      params.productSizeId,
+      params.startDate,
+      params.endDate
+    );
+    return data;
   }
 );
