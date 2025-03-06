@@ -21,6 +21,8 @@ import Categories from "./pages/Categories";
 import AddToStock from "./pages/AddToStock";
 import ConfirmRequest from "./pages/ConfirmRequest";
 import Revenue from "./pages/Revenue";
+import HistorysTOCK from "./pages/HistoryStock";
+import HistoryStock from "./pages/HistoryStock";
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -101,6 +103,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/products/historyStock",
+        element: <HistoryStock />,
       },
     ],
     
