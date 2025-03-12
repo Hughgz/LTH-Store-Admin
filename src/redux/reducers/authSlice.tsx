@@ -40,7 +40,7 @@ export const loginUser = createAsyncThunk<
   }
 );
 
-const API_URL_AUTHEN = "https://lthshop.azurewebsites.net/api/Authen";
+const API_URL_AUTHEN = "http://localhost:5049/api/Authen";
 
 // Slice cho Auth
 const authSlice = createSlice({

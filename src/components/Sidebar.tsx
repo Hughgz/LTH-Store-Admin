@@ -86,21 +86,16 @@ const Sidebar = () => {
                 History Stock
               </NavLink>
 
+              <NavLink
+                to="/products/price-manage"
+                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+              >
+                Price Product
+              </NavLink>
+
             </div>
           )}
-
-          {/* Orders */}
           
-
-          {/* Categories */}
-          <NavLink
-            to="/categories"
-            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-          >
-            <HiOutlineTruck className="text-xl" />
-            <span className="text-lg">Categories</span>
-          </NavLink>
-
           {/* Revenue */}
           <NavLink
             to="/revenue"
