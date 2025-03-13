@@ -93,6 +93,13 @@ const Sidebar = () => {
                 Price Product
               </NavLink>
 
+              <NavLink
+                to="/products/historyPrice"
+                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+              >
+                History Price
+              </NavLink>
+
             </div>
           )}
           

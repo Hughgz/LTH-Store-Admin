@@ -23,6 +23,7 @@ import ConfirmRequest from "./pages/ConfirmRequest";
 import Revenue from "./pages/Revenue";
 import HistoryStock from "./pages/HistoryStock";
 import PriceManage from "./pages/PriceManage";
+import HistoryPrice from "./pages/HistoryPrice";
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -111,6 +112,10 @@ const router = createBrowserRouter([
       {
         path: "/products/historyStock",
         element: <HistoryStock />,
+      },
+      {
+        path: "products/historyPrice",
+        element: <HistoryPrice />,
       },
     ],
     

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStockHistoryByProductSizeId, fetchStockHistoryByProductSizeIdAndPeriod } from "../redux/actions/historyStockAction";
+import { fetchStockHistoryByProductSizeIdAndPeriod } from "../redux/actions/historyStockAction";
 import { RootState, AppDispatch } from "../store";
 import Sidebar from "../components/Sidebar";
 
@@ -9,7 +9,6 @@ const ITEMS_PER_PAGE = 5;
 const HistoryStock = () => {
   const dispatch = useDispatch<AppDispatch>();
   const stockHistory = useSelector((state: RootState) => state.historyStock);
-
 
   useEffect(() => {
     console.log("Stock History Data:", stockHistory);
@@ -22,6 +21,7 @@ const HistoryStock = () => {
   });
 
   const [applyFilter, setApplyFilter] = useState(false);
+  const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -30,24 +30,31 @@ const HistoryStock = () => {
 
     if (applyFilter) {
       console.log("Apply Filter is true");
-      if (filters.startDate && filters.endDate) {
+      if (filters.productSizeId && filters.startDate && filters.endDate) {
         console.log("Fetching stock history by period:", filters);
         dispatch(fetchStockHistoryByProductSizeIdAndPeriod({
           productSizeId: Number(filters.productSizeId),
           startDate: new Date(filters.startDate),
           endDate: new Date(filters.endDate),
         }));
-      } else if (filters.productSizeId) {
-        console.log("Fetching stock history by productSizeId:", filters.productSizeId);
-        dispatch(fetchStockHistoryByProductSizeId(Number(filters.productSizeId)));
+        setError(""); 
+      } else {
+        setError("Need to select enough requirements");
       }
       setApplyFilter(false); 
     }
   }, [applyFilter, dispatch, filters]);
 
+  const handleApplyFilter = () => {
+    if (filters.productSizeId && filters.startDate && filters.endDate) {
+      setApplyFilter(true);
+      setError(""); 
+    } else {
+      setError("Need to select enough requirements");
+    }
+  };
 
   const totalPages = Math.ceil(stockHistory.filtered.length / ITEMS_PER_PAGE);
-
 
   const paginatedData = stockHistory.filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -60,7 +67,6 @@ const HistoryStock = () => {
       <div className="flex-1 p-6 overflow-auto">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
           <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Stock History</h1>
-
 
           <div className="flex flex-wrap gap-4 mb-6">
             <input
@@ -83,14 +89,20 @@ const HistoryStock = () => {
               className="border rounded-lg px-3 py-2 text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
             />
             <button
-              onClick={() => setApplyFilter(true)} 
+              onClick={handleApplyFilter} 
               className="px-4 py-2 border rounded-lg bg-gray-500 text-white"
             >
               Apply Filters
             </button>
           </div>
 
-  
+          {/* Hiển thị thông báo lỗi */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+
           {stockHistory.error && (
             <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
               {stockHistory.error}
@@ -136,7 +148,7 @@ const HistoryStock = () => {
                       <td className="p-4">{item.updatedDateTime}</td>
                       <td className="p-4">{item.productSizeID}</td>
                       <td className="p-4">{item.stockChange}</td>
-                      <td className="p-4">{item.note || "N/A"}</td>
+                      <td className="p-4" dangerouslySetInnerHTML={{ __html:  item.note || "N/A" }}></td>
                     </tr>
                   ))
                 ) : (
