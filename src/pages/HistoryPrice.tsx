@@ -190,11 +190,11 @@ const HistoryPrice = () => {
                     <td className="px-4 py-6 border-b text-center">{HistoryPrice.size}</td>
                     <td className="px-4 py-6 border-b text-center">{HistoryPrice.sellingPrice}</td>
                     <td className="px-4 py-6 border-b text-center">
-                      {HistoryPrice.productPriceStatus == "1" ? (
+                      {HistoryPrice.productPriceStatus == "0" ? (
                         <span className="text-green-600">Active</span>
-                      ) : HistoryPrice.productPriceStatus == "2" ? (
+                      ) : HistoryPrice.productPriceStatus == "1" ? (
                         <span className="text-red-600">Inactive</span>
-                      ) : HistoryPrice.productPriceStatus == "3" ? (
+                      ) : HistoryPrice.productPriceStatus == "2" ? (
                         <span className="text-yellow-600">PendingForApproval</span>
                       ) : (
                         <span className="text-gray-600">Unknown</span>
