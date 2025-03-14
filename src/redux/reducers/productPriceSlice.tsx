@@ -63,7 +63,7 @@ export const createNewProductPrice = createAsyncThunk(
   "productPrices/createNewProductPrice",
   async (productPriceDto: ProductPriceCreateDto, { rejectWithValue }) => {
     try {
-      await productPriceApi.createProductPrice(productPriceDto);
+      await productPriceApi.createNewProductPrice(productPriceDto);
     } catch (error) {
       const axiosError = error as AxiosError;
       return rejectWithValue(axiosError.response?.data || "Error creating ProductPrice");

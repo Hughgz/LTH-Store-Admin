@@ -5,7 +5,7 @@ import SimpleInput from "../components/SimpleInput";
 import SelectInput from "../components/SelectInput";
 import { useState, useEffect } from "react";
 import productApi from "../utils/api/productApi";
-import purchaseReceiptApi from "../utils/api/purchaseReceiptsApi"; // API lưu purchase receipt
+import purchaseReceiptApi from "../utils/api/purchaseReceiptsApi";
 
 interface Product {
   productID: number;

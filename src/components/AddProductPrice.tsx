@@ -8,6 +8,7 @@ import { createNewProductPrice } from "../redux/reducers/productPriceSlice";
 import productApi from "../utils/api/productApi";
 import SelectInput from "../components/SelectInput";
 import SimpleInput from "../components/SimpleInput";
+import Spinder from "./Spinder";
 
 interface Product {
   productID: number;
@@ -19,34 +20,37 @@ interface Product {
 }
 
 interface AddProductPriceProps {
-  onCreatePrice: () => void;
   onCancel: () => void;
 }
 
-const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCreatePrice, onCancel }) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const [products, setProducts] = useState<Product[]>([]);
+const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const [selectedPrices, setSelectedPrices] = useState<
-    { product: Product; size: number | ""; price: number }[]
+    { product: Product; size: number | ""; price: number; startDate: string; endDate: string }[]
   >([]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        setLoading(true);
         const response = await productApi.getProducts();
         setProducts(response);
       } catch (err) {
         setError("Failed to fetch products");
-      } finally {
-        setLoading(false);
       }
     };
-
     fetchProducts();
   }, []);
 
@@ -62,27 +66,26 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCreatePrice, onCanc
 
     setSelectedPrices([
       ...selectedPrices,
-      { product, size: "", price: 0 }, // Chưa chọn size và giá
+      { product, size: "", price: 0, startDate: "", endDate: "" }, // Chưa chọn size và giá
     ]);
   };
 
-  const handleSizeChange = (index: number, newSize: number) => {
-    // Get the current product being modified
+  const handleSizeChange = (index: number, newSizeId: number) => {
     const currentProduct = selectedPrices[index].product;
-  
-    // Check if the new size is already selected for this product
+
+    // Kiểm tra xem size đã được chọn chưa (tránh trùng lặp size)
     const isDuplicateSize = selectedPrices.some(
-      (item, i) => i !== index && item.product.productID === currentProduct.productID && item.size === newSize
+      (item, i) => i !== index && item.product.productID === currentProduct.productID && item.size === newSizeId
     );
-  
+
     if (isDuplicateSize) {
-      alert(`The size ${newSize} is already selected for "${currentProduct.name}". Please choose a different size.`);
+      alert(`The size ${newSizeId} is already selected for "${currentProduct.name}". Please choose a different size.`);
       return;
     }
-  
-    // Update state if no duplicate
+
+    // Cập nhật lại giá trị size trong selectedPrices, lưu productSizeID
     setSelectedPrices((prev) =>
-      prev.map((p, i) => (i === index ? { ...p, size: newSize } : p))
+      prev.map((p, i) => (i === index ? { ...p, size: newSizeId } : p))
     );
   };
 
@@ -92,47 +95,56 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCreatePrice, onCanc
     );
   };
 
+  const handleStartDateChange = (index: number, newStartDate: string) => {
+    setSelectedPrices((prev) =>
+      prev.map((p, i) => (i === index ? { ...p, startDate: newStartDate } : p))
+    );
+  };
+
+  const handleEndDateChange = (index: number, newEndDate: string) => {
+    setSelectedPrices((prev) =>
+      prev.map((p, i) => (i === index ? { ...p, endDate: newEndDate } : p))
+    );
+  };
+
   const handleRemoveProduct = (index: number) => {
     setSelectedPrices((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmitPrices = () => {
+  const handleSubmitPrices = async () => {
     if (selectedPrices.some((p) => p.size === "" || p.price <= 0)) {
       alert("Please select a size and enter a valid price for all products.");
       return;
     }
-
+  
     const pricesToCreate = selectedPrices.map((item) => ({
       productSizeId: item.size,
       sellingPrice: item.price,
       description: `Price for ${item.product.name} - Size ${item.size}`,
+      startDate: item.startDate,
+      endDate: item.endDate,
     }));
-
-    dispatch(createNewProductPrice(pricesToCreate)).then(() => {
-      onCreatePrice();
-      alert("Product prices added successfully!");
-      setSelectedPrices([]); // Clear list after submitting
-    });
+  
+    for (let price of pricesToCreate) {
+      try {
+        await dispatch(createNewProductPrice(price));
+      } catch (error) {
+        console.error("Error creating product price:", error);
+        alert("Failed to add product price. Please try again.");
+        return;
+      }
+    }
+    alert("Product prices added successfully!");
+    setSelectedPrices([]); // Clear list after submitting
   };
+   
 
+  if (loading) {
+    return <Spinder></Spinder>;
+  }
   return (
     <div className="h-auto border-t border-blackSecondary flex dark:bg-blackPrimary bg-whiteSecondary">
       <div className="dark:bg-blackPrimary bg-whiteSecondary w-full py-10">
-        <div className="px-4 sm:px-6 lg:px-8 pb-8 border-b border-gray-800 flex justify-between items-center">
-          <h2 className="text-3xl font-bold dark:text-whiteSecondary text-blackPrimary">
-            Add Product Prices
-          </h2>
-          <button
-            onClick={handleSubmitPrices}
-            className="dark:bg-whiteSecondary bg-blackPrimary w-auto px-6 py-2 text-lg flex items-center justify-center gap-x-2 dark:hover:bg-white hover:bg-blackSecondary duration-200"
-          >
-            <HiOutlineSave className="dark:text-blackPrimary text-whiteSecondary text-xl" />
-            <span className="dark:text-blackPrimary text-whiteSecondary font-semibold">
-              Submit Prices
-            </span>
-          </button>
-        </div>
-
         <div className="flex gap-6 p-6">
           {/* Danh sách sản phẩm đã chọn */}
           <div className="w-2/3 bg-gray-100 p-4 rounded-md dark:bg-gray-800">
@@ -145,6 +157,8 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCreatePrice, onCanc
                       <th className="border p-2">Product Name</th>
                       <th className="border p-2">Size</th>
                       <th className="border p-2">Selling Price</th>
+                      <th className="border p-2">Start Date</th>
+                      <th className="border p-2">End Date</th>
                       <th className="border p-2">Actions</th>
                     </tr>
                   </thead>
@@ -157,12 +171,12 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCreatePrice, onCanc
                             selectList={[
                               { label: "Select a size", value: "" },
                               ...item.product.productSizes.map((size) => ({
-                                label: size.size.toString(),
-                                value: size.productSizeID.toString(),
+                                label: size.size.toString(),  // Hiển thị size (ví dụ: "40")
+                                value: size.productSizeID.toString(),  // Lưu productSizeID (ví dụ: "1")
                               })),
                             ]}
-                            value={item.size.toString()}
-                            onChange={(e) => handleSizeChange(index, Number(e.target.value))}
+                            value={item.size.toString()}  // Lưu productSizeID
+                            onChange={(e) => handleSizeChange(index, Number(e.target.value))}  // Khi chọn, lưu productSizeID
                           />
                         </td>
                         <td className="border p-2">
@@ -172,6 +186,22 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCreatePrice, onCanc
                             value={item.price}
                             onChange={(e) => handlePriceChange(index, Number(e.target.value))}
                             className="w-full text-center"
+                          />
+                        </td>
+                        <td className="border p-2">
+                          <input
+                            type="date"
+                            value={item.startDate}
+                            onChange={(e) => handleStartDateChange(index, e.target.value)}
+                            className="w-full"
+                          />
+                        </td>
+                        <td className="border p-2">
+                          <input
+                            type="date"
+                            value={item.endDate}
+                            onChange={(e) => handleEndDateChange(index, e.target.value)}
+                            className="w-full"
                           />
                         </td>
                         <td className="border p-2 text-center">
@@ -222,6 +252,9 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCreatePrice, onCanc
         </div>
 
         <div className="px-6 pb-4 flex justify-end">
+        <button onClick={handleSubmitPrices} className="bg-gray-500 text-white px-4 py-2 rounded-lg mr-3">
+            Submit
+          </button>
           <button onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded-lg">
             Cancel
           </button>

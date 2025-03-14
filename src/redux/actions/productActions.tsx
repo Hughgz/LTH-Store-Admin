@@ -1,6 +1,7 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import productApi from '../../utils/api/productApi';
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import productApi from "../../utils/api/productApi";
 
+// Define your Product interface
 interface Product {
   id: string;
   name: string;
@@ -23,49 +24,49 @@ interface Product {
   }[];
 }
 
-// Lấy tất cả sản phẩm
+// Fetch all products
 export const fetchProducts = createAsyncThunk<Product[]>(
-  'products/fetchProducts',
+  "products/fetchProducts",
   async () => {
     return await productApi.getProducts();
   }
 );
 
-// Lấy sản phẩm theo productID
+// Fetch a product by ID
 export const fetchProductById = createAsyncThunk<Product, string>(
-  'products/fetchProductById',
+  "products/fetchProductById",
   async (productId) => {
     return await productApi.getProductById(productId);
   }
 );
 
-// Lấy sản phẩm theo nameAlias
+// Fetch product by name alias
 export const fetchProductByNameAlias = createAsyncThunk<Product, string>(
-  'products/fetchProductByNameAlias',
+  "products/fetchProductByNameAlias",
   async (nameAlias) => {
     return await productApi.getProductByNameAlias(nameAlias);
   }
 );
 
-// Thêm sản phẩm mới
-export const createProduct = createAsyncThunk<Product, Omit<Product, 'id'>>(
-  'products/createProduct',
+// Add a new product
+export const createProduct = createAsyncThunk<Product, Omit<Product, "id">>(
+  "products/createProduct",
   async (product) => {
     return await productApi.addProduct(product);
   }
 );
 
-// Cập nhật sản phẩm
+// Update an existing product
 export const updateExistingProduct = createAsyncThunk<Product, { productId: string; product: Partial<Product> }>(
-  'products/updateExistingProduct',
+  "products/updateExistingProduct",
   async ({ productId, product }) => {
     return await productApi.updateProduct(productId, product);
   }
 );
 
-// Xóa sản phẩm
+// Delete a product
 export const deleteProduct = createAsyncThunk<void, string>(
-  'products/deleteProduct',
+  "products/deleteProduct",
   async (productId) => {
     await productApi.deleteProduct(productId);
   }

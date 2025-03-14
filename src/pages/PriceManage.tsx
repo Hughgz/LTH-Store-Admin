@@ -24,20 +24,12 @@ const ProductManage: React.FC = () => {
     dispatch(fetchAllPendingProductPrices());
   }, [dispatch]);
 
-  const handleApprove = (productPriceId: number) => {
-    dispatch(approveProductPrice(productPriceId)).then(() => {
-      dispatch(fetchAllPendingProductPrices());
-    });
-  };
-
-  const handleCreatePrice = (newPrices) => {
-    dispatch(createNewProductPrice(newPrices)).then(() => {
-      dispatch(fetchAllPendingProductPrices());
-      setViewMode("list"); // Quay lại danh sách sau khi thêm giá thành công
-    });
-  };
-
-  const totalPages = Math.ceil(pendingProductPrices.length / rowsPerPage);
+  // const handleCreatePrice = () => {
+  //   dispatch(createNewProductPrice(newPrices)).then(() => {
+  //     dispatch(fetchAllPendingProductPrices());
+  //     setViewMode("list"); // Stay on the same page after price submission
+  //   });
+  // };  
 
   const paginatedPrices = pendingProductPrices
     .filter((price) => price.description?.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -101,44 +93,11 @@ const ProductManage: React.FC = () => {
               ) : error ? (
                 <p className="text-red-500">{error}</p>
               ) : (
-                <PriceTable products={paginatedPrices} onApprove={handleApprove} />
+                <PriceTable products={paginatedPrices}/>
               )}
-
-              {/* Phân trang */}
-              <div className="flex justify-center items-center px-4 sm:px-6 lg:px-8 py-6">
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 dark:text-whiteSecondary text-blackPrimary py-1 px-3 hover:border-gray-500"
-                  >
-                    Prev
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`border border-gray-600 py-1 px-3 ${
-                        currentPage === page
-                          ? "dark:bg-whiteSecondary bg-blackPrimary dark:text-blackPrimary text-whiteSecondary"
-                          : "dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary"
-                      } hover:border-gray-500`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 dark:text-whiteSecondary text-blackPrimary py-1 px-3 hover:border-gray-500"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
             </>
           ) : (
-            <AddProductPrice onCreatePrice={handleCreatePrice} onCancel={() => setViewMode("list")} />
+            <AddProductPrice onCancel={() => setViewMode("list")} />
           )}
         </div>
       </div>

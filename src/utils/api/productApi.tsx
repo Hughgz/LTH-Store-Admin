@@ -4,15 +4,15 @@ import { variables } from './variables';
 const API_URL = variables.PRODUCT_API;
 
 interface ProductSize {
-  id: string;
+  id: number;
   size: number;
   price: number;
   costPrice: number;
   quantity: number;
 }
 
-interface Product {
-  id: string;
+export interface Product {
+  id: number;
   name: string;
   brand: string;
   description: string;
