@@ -195,10 +195,10 @@ const HistoryPrice = () => {
                       ) : HistoryPrice.productPriceStatus == "1" ? (
                         <span className="text-red-600">Inactive</span>
                       ) : HistoryPrice.productPriceStatus == "2" ? (
-                        <span className="text-yellow-600">PendingForApproval</span>
-                      ) : (
-                        <span className="text-gray-600">Unknown</span>
-                      )}
+                        <span className="text-yellow-600">Pending</span>
+                      ) : HistoryPrice.productPriceStatus == "3" ? (
+                        <span className="text-red-600">Reject</span>
+                      ): ""}
                     </td>
                     <td className="px-4 py-6 border-b text-left">{HistoryPrice.description}</td>
                   </tr>

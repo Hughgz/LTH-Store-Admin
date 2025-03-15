@@ -9,14 +9,18 @@ interface ProductSize {
   size: string;
   price: number;
   quantity: number;
+  realQuantity: number;  // Added realQuantity
+  stockQuantity: number; // Added stockQuantity
+  productSizeId: number; // Added productSizeId
 }
-// Định nghĩa kiểu dữ liệu cho Product
+
+// Updated Product interface
 interface Product {
   productID: string;
   name: string;
   imageURL: string;
   brand: string;
-  productSizes: ProductSize[];
+  productSizes: ProductSize[]; // Ensure both components use this structure
 }
 
 const Products: React.FC = () => {
@@ -44,6 +48,7 @@ const Products: React.FC = () => {
         const data = await productApi.getProducts();
         setProducts(data);
         setError(null);
+        console.log("Data Product: ", data);
       } catch (err) {
         setError("Failed to fetch products");
       } finally {

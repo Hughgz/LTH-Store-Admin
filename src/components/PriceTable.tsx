@@ -46,6 +46,26 @@ const PriceTable: React.FC<PriceTableProps> = ({ products }) => {
       alert("Failed to approve product price. Please try again.");
     }
   };
+  const handleRejectClick = async (productPriceId: number) => {
+    try {
+      const response = await fetch(`http://localhost:5049/api/ProductPrices/reject/${productPriceId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to approve product price");
+      }
+      console.log("Product price approved successfully:", response);
+      alert("Product price approved successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error approving product price:", error);
+      alert("Failed to approve product price. Please try again.");
+    }
+  };
   if (isLoading) {
     return <Spinder />;
   }
@@ -91,6 +111,7 @@ const PriceTable: React.FC<PriceTableProps> = ({ products }) => {
                   </button>
 
                   <button
+                  onClick={() => handleRejectClick(product.id)}
                     className="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600"
                   >
                     Reject

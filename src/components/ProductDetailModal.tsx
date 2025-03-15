@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface ProductSize {
   size: string;
   price: number;
   quantity: number;
+  realQuantity: number; // Added realQuantity
+  stockQuantity: number; // Added stockQuantity
+  productSizeId: number; // Added productSizeId
 }
 
 interface Product {
@@ -27,6 +30,58 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 }) => {
   if (!isModalOpen || !selectedProduct) return null;
 
+  const [sellingPrice, setSellingPrice] = useState<number | null>(null);
+  const [productPriceStatus, setProductPriceStatus] = useState<string | null>(null);
+
+  const handleProductPrice = async (productSizeId: number) => {
+    try {
+      // Fetching the price data
+      const response = await fetch(`http://localhost:5049/api/ProductPrices/${productSizeId}`);
+      const data = await response.json();
+
+      if (data && data.sellingPrice !== undefined) {
+        setSellingPrice(data.sellingPrice); // Set the selling price
+      } else {
+        console.error("Price data not found");
+        setSellingPrice(0); // Set to a default value if price is missing
+      }
+
+      // Fetch the product price status
+      if (data && data.productPriceStatus !== undefined) {
+        let priceStatus = "";
+
+        switch (data.productPriceStatus) {
+          case 0:
+            priceStatus = "Active";
+            break;
+          case 1:
+            priceStatus = "Inactive";
+            break;
+          case 2:
+            priceStatus = "Pending";
+            break;
+          case 3:
+            priceStatus = "Reject";
+            break;
+          default:
+            priceStatus = "Unknown";
+            break;
+        }
+
+        setProductPriceStatus(priceStatus);
+      } else {
+        console.error("Price status not found");
+        setProductPriceStatus("Unknown");
+      }
+
+    } catch (error) {
+      console.error("Error fetching product price data:", error);
+      setSellingPrice(0);
+      setProductPriceStatus("Unknown");
+    }
+  };
+console.log("Selling price", sellingPrice);
+console.log("Status", productPriceStatus);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white dark:bg-gray-800 w-11/12 max-w-lg rounded-lg shadow-lg overflow-hidden">
@@ -63,17 +118,27 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <tr>
                   <th className="px-4 py-3 text-sm font-medium">Size</th>
                   <th className="px-4 py-3 text-sm font-medium">Price</th>
-                  <th className="px-4 py-3 text-sm font-medium">Quantity</th>
+                  <th className="px-4 py-3 text-sm font-medium">Real Quantity</th>
+                  <th className="px-4 py-3 text-sm font-medium">Stock Quantity</th>
+                  <th className="px-4 py-3 text-sm font-medium">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {selectedProduct.productSizes.map((size, index) => (
-                  <tr key={index} className="border-t">
+                {selectedProduct.productSizes.map((size) => (
+                  <tr
+                    key={size.productSizeId}
+                    className="border-t"
+                    onClick={() => handleProductPrice(size.productSizeId)} // Trigger price fetch on click
+                  >
                     <td className="px-4 py-3 text-sm text-gray-800">{size.size}</td>
                     <td className="px-4 py-3 text-sm text-gray-800">
-                      {size.price.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                      {sellingPrice}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-800">{size.quantity}</td>
+                    <td className="px-4 py-3 text-sm text-gray-800">{size.realQuantity}</td>
+                    <td className="px-4 py-3 text-sm text-gray-800">{size.stockQuantity}</td>
+                    <td className="px-4 py-3 text-sm text-gray-800">
+                      {productPriceStatus}
+                    </td>
                   </tr>
                 ))}
               </tbody>

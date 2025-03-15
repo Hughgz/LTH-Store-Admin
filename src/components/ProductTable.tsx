@@ -11,14 +11,18 @@ interface ProductSize {
   size: string;
   price: number;
   quantity: number;
+  realQuantity: number;  // Added realQuantity
+  stockQuantity: number; // Added stockQuantity
+  productSizeId: number; // Added productSizeId
 }
 
+// Updated Product interface
 interface Product {
   productID: string;
   name: string;
   imageURL: string;
   brand: string;
-  productSizes: ProductSize[];
+  productSizes: ProductSize[]; // Ensure both components use this structure
 }
 
 interface ProductTableProps {
@@ -70,7 +74,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   if (isLoading) {
     return <Spinder />;
   }
-
+  console.log("Selected product", selectedProduct);
   return (
     <>
       <table className="mt-6 w-full whitespace-nowrap text-left max-lg:block max-lg:overflow-x-scroll">
@@ -86,7 +90,6 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
             <th className="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8">Product</th>
             <th className="py-2 pl-0 pr-8 font-semibold table-cell">Brand</th>
             <th className="py-2 pl-0 pr-8 font-semibold table-cell">Sizes</th>
-            <th className="py-2 pl-0 pr-8 font-semibold table-cell lg:pr-20">Price</th>
             <th className="py-2 pl-0 pr-4 text-right font-semibold table-cell sm:pr-6 lg:pr-8">
               Actions
             </th>
@@ -94,8 +97,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
         </thead>
         <tbody className="divide-y divide-white/5">
           {products.map((item) => {
-            const sizes = item.productSizes.map((size) => size.size).join(", ");
-            const price = item.productSizes[0]?.price || 0;
+            const sizes = item.productSizes.map((size) => size.size).join(", ");            
             const isInStock = item.productSizes.some((size) => size.quantity > 0);
 
             return (
@@ -129,12 +131,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                     </div>
                   </div>
                 </td>
-                <td className="py-4 pl-0 pr-8 text-sm leading-6 dark:text-rose-200 text-rose-600 font-medium table-cell lg:pr-20">
-                  {price.toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  })}
-                </td>
+               
                 <td className="py-4 pl-0 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
                   <div className="flex gap-x-1 justify-end">
                     <button
