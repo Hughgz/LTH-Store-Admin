@@ -9,7 +9,7 @@ import { useAuth } from "../utils/hooks/useAuth";
 
 const Sidebar = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isProductOpen, setIsProductOpen] = useState(false); // Dropdown sản phẩm
+  const [isProductOpen, setIsProductOpen] = useState(false);
   const { isSidebarOpen } = useAppSelector((state) => state.dashboard);
   const dispatch = useAppDispatch();
   const { token, logoutUser } = useAuth();
@@ -86,21 +86,23 @@ const Sidebar = () => {
                 History Stock
               </NavLink>
 
+              <NavLink
+                to="/products/price-manage"
+                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+              >
+                Price Product
+              </NavLink>
+
+              <NavLink
+                to="/products/historyPrice"
+                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+              >
+                History Price
+              </NavLink>
+
             </div>
           )}
-
-          {/* Orders */}
           
-
-          {/* Categories */}
-          <NavLink
-            to="/categories"
-            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-          >
-            <HiOutlineTruck className="text-xl" />
-            <span className="text-lg">Categories</span>
-          </NavLink>
-
           {/* Revenue */}
           <NavLink
             to="/revenue"

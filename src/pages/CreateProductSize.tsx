@@ -35,9 +35,9 @@ const AddProductSize: React.FC<ModalProps> = ({ isModalOpen, closeModal, product
 
     const newSize = {
       size: parseInt(sizeData.size),
-      price: parseFloat(sizeData.price),
-      quantity: parseInt(sizeData.quantity),
-      productID: parseInt(productID || "0"), // Fall back to 0 if productID is null
+      price: parseFloat("0"),
+      quantity: parseInt("0"),
+      productID: parseInt(productID || "0"),
     };
 
     try {
@@ -105,34 +105,7 @@ const AddProductSize: React.FC<ModalProps> = ({ isModalOpen, closeModal, product
               className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-md"
             />
           </div>
-          {/* Price Field */}
-          <div>
-            <label htmlFor="product-price" className="text-sm font-semibold">
-              Price
-            </label>
-            <input
-              id="product-price"
-              type="number"
-              placeholder="Enter product price..."
-              value={sizeData.price}
-              onChange={(e) => handleInputChange("price", e.target.value)}
-              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-          {/* Quantity Field */}
-          <div>
-            <label htmlFor="product-quantity" className="text-sm font-semibold">
-              Quantity
-            </label>
-            <input
-              id="product-quantity"
-              type="number"
-              placeholder="Enter product quantity..."
-              value={sizeData.quantity}
-              onChange={(e) => handleInputChange("quantity", e.target.value)}
-              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
+          
           {/* Submit Button */}
           <div className="flex justify-end">
             <button

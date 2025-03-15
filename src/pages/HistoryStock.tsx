@@ -148,7 +148,7 @@ const HistoryStock = () => {
                       <td className="p-4">{item.updatedDateTime}</td>
                       <td className="p-4">{item.productSizeID}</td>
                       <td className="p-4">{item.stockChange}</td>
-                      <td className="p-4">{item.note || "N/A"}</td>
+                      <td className="p-4" dangerouslySetInnerHTML={{ __html:  item.note || "N/A" }}></td>
                     </tr>
                   ))
                 ) : (

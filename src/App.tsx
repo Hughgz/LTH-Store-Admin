@@ -21,8 +21,9 @@ import Categories from "./pages/Categories";
 import AddToStock from "./pages/AddToStock";
 import ConfirmRequest from "./pages/ConfirmRequest";
 import Revenue from "./pages/Revenue";
-import HistorysTOCK from "./pages/HistoryStock";
 import HistoryStock from "./pages/HistoryStock";
+import PriceManage from "./pages/PriceManage";
+import HistoryPrice from "./pages/HistoryPrice";
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
       {
         path: "/products/create-product",
         element: <CreateProduct />,
+      },
+      {
+        path: "/products/price-manage",
+        element: <PriceManage />,
       },
       {
         path: "/products/:id",
@@ -107,6 +112,10 @@ const router = createBrowserRouter([
       {
         path: "/products/historyStock",
         element: <HistoryStock />,
+      },
+      {
+        path: "products/historyPrice",
+        element: <HistoryPrice />,
       },
     ],
     
