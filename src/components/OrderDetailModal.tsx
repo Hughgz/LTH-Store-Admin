@@ -89,7 +89,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                     <td className="px-6 py-3 text-sm text-gray-800">{item.product.name}</td>
                     <td className="px-6 py-3 text-sm text-gray-800">{item.productSize.size}</td>
                     <td className="px-6 py-3 text-sm text-gray-800">{item.quantity}</td>
-                    <td className="px-6 py-3 text-sm text-gray-800">
+                    {/* <td className="px-6 py-3 text-sm text-gray-800">
                       {item.productSize.price.toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
@@ -100,7 +100,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                         style: "currency",
                         currency: "VND",
                       })}
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>

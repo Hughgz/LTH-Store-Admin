@@ -3,26 +3,25 @@ import Sidebar from "../components/Sidebar";
 import { HiOutlineChevronRight } from "react-icons/hi";
 import { AiOutlineExport } from "react-icons/ai";
 
+interface ProductPrice {
+  id: number;
+  createdAt: string;
+  startDate: string;
+  endDate: string;
+  productSizeId: number;
+  sellingPrice: number;
+  productPriceStatus: string;
+  description: string;
+  productName?: string;
+  size?: string;
+  brand?: string;
+}
 const HistoryPrice = () => {
-  interface ProductPrice {
-    id: number;
-    createdAt: string;
-    startDate: string;
-    endDate: string;
-    productSizeId: number;
-    sellingPrice: number;
-    productPriceStatus: string;
-    description: string;
-    productName?: string; // thêm
-    size?: string; // thêm
-    brand?: string; // thêm
-  }
-
-
   const [productPrices, setProductPrices] = useState<ProductPrice[]>([]);
-  const [productSizeId, setProductSizeId] = useState(""); 
+  const [productSizeId, setProductSizeId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsAndSizes, setProductsAndSizes] = useState<{name: string, size: string, id: number}[]>([]);
+  const [productsAndSizes, setProductsAndSizes] = useState<{ name: string; size: string; id: number }[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const rowsPerPage = 5;
   const visiblePageCount = 3;
 
@@ -75,16 +74,15 @@ const HistoryPrice = () => {
     }
   };
 
-
   const fetchProductNamesAndSizes = async () => {
     try {
-      const response = await fetch("http://localhost:5049/api/Products"); 
+      const response = await fetch("http://localhost:5049/api/Products");
       if (!response.ok) {
         throw new Error("Failed to fetch products");
       }
       const products = await response.json();
 
-      const sizesResponse = await fetch("http://localhost:5049/api/ProductSizes"); 
+      const sizesResponse = await fetch("http://localhost:5049/api/ProductSizes");
       if (!sizesResponse.ok) {
         throw new Error("Failed to fetch product sizes");
       }
@@ -111,6 +109,14 @@ const HistoryPrice = () => {
       fetchPrices();
     }
   }, [productSizeId]);
+
+
+  const filteredProductsAndSizes = searchTerm
+    ? productsAndSizes.filter((item) =>
+    (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (typeof item.size === 'string' && item.size.toLowerCase().includes(searchTerm.toLowerCase())))
+    )
+    : [];  // Nếu searchTerm trống, không hiển thị
 
   return (
     <div className="h-auto border-t border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
@@ -139,19 +145,14 @@ const HistoryPrice = () => {
           </div>
 
           <div className="px-4 sm:px-6 lg:px-8 mt-5">
-            {/* Dropdown for Product Name and Size */}
-            <select
+            {/* Input để tìm kiếm sản phẩm và size */}
+            <input
+              type="text"
               className="w-60 h-10 border dark:bg-blackPrimary bg-white border-gray-600 dark:text-whiteSecondary text-blackPrimary outline-0 indent-10 dark:focus:border-gray-500 focus:border-gray-400"
-              value={productSizeId}
-              onChange={(e) => setProductSizeId(e.target.value)}
-            >
-              <option value="">Select Product Size</option>
-              {productsAndSizes.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name} - {item.size}
-                </option>
-              ))}
-            </select>
+              placeholder="Search Product name"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
             <button
               onClick={fetchPrices}
               className="ml-2 bg-blue-500 text-white py-2 px-4 rounded"
@@ -160,13 +161,33 @@ const HistoryPrice = () => {
             </button>
           </div>
 
+          {/* Hiển thị kết quả tìm kiếm dưới dạng dropdown */}
+          {searchTerm && filteredProductsAndSizes.length > 0 && (
+            <div className="mt-0 ml-8 absolute bg-white border border-gray-600 w-60 max-h-40 overflow-y-auto z-10">
+              <ul>
+                {filteredProductsAndSizes.map((item) => (
+                  <li
+                    key={item.id}
+                    onClick={() => {
+                      setSearchTerm(`${item.name} - ${item.size}`);
+                      setProductSizeId(item.id.toString());
+                    }}
+                    className="cursor-pointer hover:bg-gray-200 px-4 py-2"
+                  >
+                    {item.name} - {item.size}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <table className="min-w-full table-auto border-collapse mt-5">
             <thead>
               <tr>
                 <th className="px-4 py-2 border-b dark:text-whiteSecondary text-blackPrimary">Created At</th>
                 <th className="px-4 py-2 border-b dark:text-whiteSecondary text-blackPrimary">Start Date</th>
                 <th className="px-4 py-2 border-b dark:text-whiteSecondary text-blackPrimary">End Date</th>
-                <th className="px-4 py-2 border-b dark:text-whiteSecondary text-blackPrimary">Product Name</th> 
+                <th className="px-4 py-2 border-b dark:text-whiteSecondary text-blackPrimary">Product Name</th>
                 <th className="px-4 py-2 border-b dark:text-whiteSecondary text-blackPrimary">Size</th>
                 <th className="px-4 py-2 border-b dark:text-whiteSecondary text-blackPrimary">Selling Price</th>
                 <th className="px-4 py-2 border-b dark:text-whiteSecondary text-blackPrimary">Status</th>
@@ -188,17 +209,24 @@ const HistoryPrice = () => {
                     <td className="px-4 py-6 border-b text-center">{HistoryPrice.endDate}</td>
                     <td className="px-4 py-6 border-b text-center">{HistoryPrice.productName}</td>
                     <td className="px-4 py-6 border-b text-center">{HistoryPrice.size}</td>
-                    <td className="px-4 py-6 border-b text-center">{HistoryPrice.sellingPrice}</td>
+                    <td className="px-4 py-6 border-b text-center">
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      }).format(HistoryPrice.sellingPrice)}
+                    </td>
                     <td className="px-4 py-6 border-b text-center">
                       {HistoryPrice.productPriceStatus == "0" ? (
                         <span className="text-green-600">Active</span>
                       ) : HistoryPrice.productPriceStatus == "1" ? (
-                        <span className="text-red-600">Inactive</span>
+                        <span className="text-gray-600">Inactive</span>
                       ) : HistoryPrice.productPriceStatus == "2" ? (
                         <span className="text-yellow-600">Pending</span>
-                      ) : HistoryPrice.productPriceStatus == "3" ? (
+                      ) : (
                         <span className="text-red-600">Reject</span>
-                      ): ""}
+                      )}
                     </td>
                     <td className="px-4 py-6 border-b text-left">{HistoryPrice.description}</td>
                   </tr>
@@ -220,11 +248,10 @@ const HistoryPrice = () => {
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`border border-gray-600 py-1 px-3 ${
-                    currentPage === page
-                      ? "dark:bg-whiteSecondary bg-blackPrimary dark:text-blackPrimary text-whiteSecondary"
-                      : "dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary"
-                  } hover:border-gray-500`}
+                  className={`border border-gray-600 py-1 px-3 ${currentPage === page
+                    ? "dark:bg-whiteSecondary bg-blackPrimary dark:text-blackPrimary text-whiteSecondary"
+                    : "dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary"
+                    } hover:border-gray-500`}
                 >
                   {page}
                 </button>

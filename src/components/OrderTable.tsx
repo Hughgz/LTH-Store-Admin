@@ -70,7 +70,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, users }) => {
   const handleOpenDetailModal = async (order: Order) => {
     try {
       const response = await axios.get(
-        `https://lthshop.azurewebsites.net/api/OrderItems/${order.orderID}`
+        `http://localhost:5049/api/OrderItems/${order.orderID}`
       );
       const orderWithItems: Order = {
         ...order,

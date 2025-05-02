@@ -4,9 +4,9 @@ interface ProductSize {
   size: string;
   price: number;
   quantity: number;
-  realQuantity: number; // Added realQuantity
-  stockQuantity: number; // Added stockQuantity
-  productSizeId: number; // Added productSizeId
+  realQuantity: number;
+  stockQuantity: number;
+  productSizeId: number;
 }
 
 interface Product {
@@ -23,6 +23,11 @@ interface ProductDetailModalProps {
   selectedProduct: Product | null;
 }
 
+interface PriceData {
+  sellingPrice: number;
+  productPriceStatus: number;
+}
+
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   isModalOpen,
   closeModal,
@@ -30,58 +35,51 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 }) => {
   if (!isModalOpen || !selectedProduct) return null;
 
-  const [sellingPrice, setSellingPrice] = useState<number | null>(null);
-  const [productPriceStatus, setProductPriceStatus] = useState<string | null>(null);
+  // Sử dụng một đối tượng để lưu trữ giá và trạng thái cho từng productSizeId
+  const [priceDataMap, setPriceDataMap] = useState<{ [key: number]: PriceData }>({});
 
   const handleProductPrice = async (productSizeId: number) => {
     try {
-      // Fetching the price data
+      console.log("Fetching data for productSizeId:", productSizeId); // Debug
       const response = await fetch(`http://localhost:5049/api/ProductPrices/${productSizeId}`);
       const data = await response.json();
+      console.log("API Response:", data); // Debug
 
-      if (data && data.sellingPrice !== undefined) {
-        setSellingPrice(data.sellingPrice); // Set the selling price
+      if (data && data.sellingPrice !== undefined && data.productPriceStatus !== undefined) {
+        // Cập nhật dữ liệu vào priceDataMap
+        setPriceDataMap((prev) => ({
+          ...prev,
+          [productSizeId]: {
+            sellingPrice: data.sellingPrice,
+            productPriceStatus: data.productPriceStatus,
+          },
+        }));
       } else {
         console.error("Price data not found");
-        setSellingPrice(0); // Set to a default value if price is missing
       }
-
-      // Fetch the product price status
-      if (data && data.productPriceStatus !== undefined) {
-        let priceStatus = "";
-
-        switch (data.productPriceStatus) {
-          case 0:
-            priceStatus = "Active";
-            break;
-          case 1:
-            priceStatus = "Inactive";
-            break;
-          case 2:
-            priceStatus = "Pending";
-            break;
-          case 3:
-            priceStatus = "Reject";
-            break;
-          default:
-            priceStatus = "Unknown";
-            break;
-        }
-
-        setProductPriceStatus(priceStatus);
-      } else {
-        console.error("Price status not found");
-        setProductPriceStatus("Unknown");
-      }
-
     } catch (error) {
       console.error("Error fetching product price data:", error);
-      setSellingPrice(0);
-      setProductPriceStatus("Unknown");
     }
   };
-console.log("Selling price", sellingPrice);
-console.log("Status", productPriceStatus);
+
+  // Hàm chuyển đổi productPriceStatus thành chuỗi
+  const getStatusString = (status: number) => {
+    switch (status) {
+      case 0:
+        return "Active";
+      case 1:
+        return "Inactive";
+      case 2:
+        return "Pending";
+      case 3:
+        return "Reject";
+      default:
+        return "Unknown";
+    }
+  };
+
+  console.log("Price Data Map:", priceDataMap); // Debug
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white dark:bg-gray-800 w-11/12 max-w-lg rounded-lg shadow-lg overflow-hidden">
@@ -124,23 +122,26 @@ console.log("Status", productPriceStatus);
                 </tr>
               </thead>
               <tbody>
-                {selectedProduct.productSizes.map((size) => (
-                  <tr
-                    key={size.productSizeId}
-                    className="border-t"
-                    onClick={() => handleProductPrice(size.productSizeId)} // Trigger price fetch on click
-                  >
-                    <td className="px-4 py-3 text-sm text-gray-800">{size.size}</td>
-                    <td className="px-4 py-3 text-sm text-gray-800">
-                      {sellingPrice}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-800">{size.realQuantity}</td>
-                    <td className="px-4 py-3 text-sm text-gray-800">{size.stockQuantity}</td>
-                    <td className="px-4 py-3 text-sm text-gray-800">
-                      {productPriceStatus}
-                    </td>
-                  </tr>
-                ))}
+                {selectedProduct.productSizes.map((size) => {
+                  const priceData = priceDataMap[size.productSizeId];
+                  return (
+                    <tr
+                      key={size.productSizeId}
+                      className="border-t cursor-pointer"
+                      onClick={() => handleProductPrice(size.productSizeId)} // Gọi hàm khi nhấp vào hàng
+                    >
+                      <td className="px-4 py-3 text-sm text-gray-800">{size.size}</td>
+                      <td className="px-4 py-3 text-sm text-gray-800">
+                        {priceData ? priceData.sellingPrice : "Loading..."}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-800">{size.realQuantity}</td>
+                      <td className="px-4 py-3 text-sm text-gray-800">{size.stockQuantity}</td>
+                      <td className="px-4 py-3 text-sm text-gray-800">
+                        {priceData ? getStatusString(priceData.productPriceStatus) : "Loading..."}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

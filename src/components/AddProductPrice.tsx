@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import React from "react";
-import { HiOutlineSave } from "react-icons/hi";
 import { MdDelete } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store";
@@ -31,7 +30,7 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const [selectedPrices, setSelectedPrices] = useState<
-    { product: Product; size: number | ""; price: number; startDate: string; endDate: string }[]
+    { product: Product; size: number | ""; price: number }[] // Đã xóa startDate và endDate
   >([]);
 
   useEffect(() => {
@@ -66,7 +65,7 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
 
     setSelectedPrices([
       ...selectedPrices,
-      { product, size: "", price: 0, startDate: "", endDate: "" }, // Chưa chọn size và giá
+      { product, size: "", price: 0 }, // Đã xóa startDate và endDate
     ]);
   };
 
@@ -75,11 +74,16 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
 
     // Kiểm tra xem size đã được chọn chưa (tránh trùng lặp size)
     const isDuplicateSize = selectedPrices.some(
-      (item, i) => i !== index && item.product.productID === currentProduct.productID && item.size === newSizeId
+      (item, i) =>
+        i !== index &&
+        item.product.productID === currentProduct.productID &&
+        item.size === newSizeId
     );
 
     if (isDuplicateSize) {
-      alert(`The size ${newSizeId} is already selected for "${currentProduct.name}". Please choose a different size.`);
+      alert(
+        `The size ${newSizeId} is already selected for "${currentProduct.name}". Please choose a different size.`
+      );
       return;
     }
 
@@ -95,18 +99,6 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
     );
   };
 
-  const handleStartDateChange = (index: number, newStartDate: string) => {
-    setSelectedPrices((prev) =>
-      prev.map((p, i) => (i === index ? { ...p, startDate: newStartDate } : p))
-    );
-  };
-
-  const handleEndDateChange = (index: number, newEndDate: string) => {
-    setSelectedPrices((prev) =>
-      prev.map((p, i) => (i === index ? { ...p, endDate: newEndDate } : p))
-    );
-  };
-
   const handleRemoveProduct = (index: number) => {
     setSelectedPrices((prev) => prev.filter((_, i) => i !== index));
   };
@@ -116,15 +108,13 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
       alert("Please select a size and enter a valid price for all products.");
       return;
     }
-  
+
     const pricesToCreate = selectedPrices.map((item) => ({
       productSizeId: item.size,
       sellingPrice: item.price,
       description: `Price for ${item.product.name} - Size ${item.size}`,
-      startDate: item.startDate,
-      endDate: item.endDate,
     }));
-  
+
     for (let price of pricesToCreate) {
       try {
         await dispatch(createNewProductPrice(price));
@@ -137,7 +127,6 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
     alert("Product prices added successfully!");
     setSelectedPrices([]); // Clear list after submitting
   };
-   
 
   if (loading) {
     return <Spinder></Spinder>;
@@ -157,8 +146,6 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
                       <th className="border p-2">Product Name</th>
                       <th className="border p-2">Size</th>
                       <th className="border p-2">Selling Price</th>
-                      <th className="border p-2">Start Date</th>
-                      <th className="border p-2">End Date</th>
                       <th className="border p-2">Actions</th>
                     </tr>
                   </thead>
@@ -171,12 +158,14 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
                             selectList={[
                               { label: "Select a size", value: "" },
                               ...item.product.productSizes.map((size) => ({
-                                label: size.size.toString(),  // Hiển thị size (ví dụ: "40")
-                                value: size.productSizeID.toString(),  // Lưu productSizeID (ví dụ: "1")
+                                label: size.size.toString(), // Hiển thị size (ví dụ: "40")
+                                value: size.productSizeID.toString(), // Lưu productSizeID (ví dụ: "1")
                               })),
                             ]}
-                            value={item.size.toString()}  // Lưu productSizeID
-                            onChange={(e) => handleSizeChange(index, Number(e.target.value))}  // Khi chọn, lưu productSizeID
+                            value={item.size.toString()} // Lưu productSizeID
+                            onChange={(e) =>
+                              handleSizeChange(index, Number(e.target.value))
+                            } // Khi chọn, lưu productSizeID
                           />
                         </td>
                         <td className="border p-2">
@@ -184,24 +173,10 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
                             type="number"
                             min="0"
                             value={item.price}
-                            onChange={(e) => handlePriceChange(index, Number(e.target.value))}
+                            onChange={(e) =>
+                              handlePriceChange(index, Number(e.target.value))
+                            }
                             className="w-full text-center"
-                          />
-                        </td>
-                        <td className="border p-2">
-                          <input
-                            type="date"
-                            value={item.startDate}
-                            onChange={(e) => handleStartDateChange(index, e.target.value)}
-                            className="w-full"
-                          />
-                        </td>
-                        <td className="border p-2">
-                          <input
-                            type="date"
-                            value={item.endDate}
-                            onChange={(e) => handleEndDateChange(index, e.target.value)}
-                            className="w-full"
                           />
                         </td>
                         <td className="border p-2 text-center">
@@ -252,10 +227,16 @@ const AddProductPrice: React.FC<AddProductPriceProps> = ({ onCancel }) => {
         </div>
 
         <div className="px-6 pb-4 flex justify-end">
-        <button onClick={handleSubmitPrices} className="bg-gray-500 text-white px-4 py-2 rounded-lg mr-3">
+          <button
+            onClick={handleSubmitPrices}
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg mr-3"
+          >
             Submit
           </button>
-          <button onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded-lg">
+          <button
+            onClick={onCancel}
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+          >
             Cancel
           </button>
         </div>

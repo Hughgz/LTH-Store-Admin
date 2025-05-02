@@ -74,7 +74,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   if (isLoading) {
     return <Spinder />;
   }
-  console.log("Selected product", selectedProduct);
+
   return (
     <>
       <table className="mt-6 w-full whitespace-nowrap text-left max-lg:block max-lg:overflow-x-scroll">
@@ -90,6 +90,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
             <th className="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8">Product</th>
             <th className="py-2 pl-0 pr-8 font-semibold table-cell">Brand</th>
             <th className="py-2 pl-0 pr-8 font-semibold table-cell">Sizes</th>
+            <th className="py-2 pl-0 pr-8 font-semibold table-cell">Quantity</th>
+            <th className="py-2 pl-0 pr-8 font-semibold table-cell">Stock Quantity</th>
             <th className="py-2 pl-0 pr-4 text-right font-semibold table-cell sm:pr-6 lg:pr-8">
               Actions
             </th>
@@ -97,8 +99,12 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
         </thead>
         <tbody className="divide-y divide-white/5">
           {products.map((item) => {
-            const sizes = item.productSizes.map((size) => size.size).join(", ");            
+            const sizes = item.productSizes.map((size) => size.size).join(", ");
             const isInStock = item.productSizes.some((size) => size.quantity > 0);
+
+            // Tính tổng realQuantity và stockQuantity
+            const totalRealQuantity = item.productSizes.reduce((sum, size) => sum + size.realQuantity, 0);
+            const totalStockQuantity = item.productSizes.reduce((sum, size) => sum + size.stockQuantity, 0);
 
             return (
               <tr key={nanoid()}>
@@ -131,7 +137,12 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                     </div>
                   </div>
                 </td>
-               
+                <td className="py-4 pl-0 pr-8 text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell">
+                  {totalRealQuantity}
+                </td>
+                <td className="py-4 pl-0 pr-8 text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell">
+                  {totalStockQuantity}
+                </td>
                 <td className="py-4 pl-0 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
                   <div className="flex gap-x-1 justify-end">
                     <button

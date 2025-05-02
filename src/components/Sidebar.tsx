@@ -1,164 +1,84 @@
-import { HiLogin, HiOutlineHome, HiUserGroup, HiOutlineChevronDown } from "react-icons/hi";
-import { HiOutlineDevicePhoneMobile } from "react-icons/hi2";
-import { HiOutlineTruck, HiOutlineX, HiOutlineUser } from "react-icons/hi";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { setSidebar } from "../features/dashboard/dashboardSlice";
-import { useAuth } from "../utils/hooks/useAuth";
+import { Link, useLocation } from 'react-router-dom';
+import { 
+  HomeIcon, ShoppingBagIcon, UserGroupIcon, 
+  ShoppingCartIcon, ChartBarIcon, QuestionMarkCircleIcon,
+  BellIcon, UserCircleIcon, Cog6ToothIcon,
+  XMarkIcon
+} from '@heroicons/react/24/outline';
 
-const Sidebar = () => {
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isProductOpen, setIsProductOpen] = useState(false);
-  const { isSidebarOpen } = useAppSelector((state) => state.dashboard);
-  const dispatch = useAppDispatch();
-  const { token, logoutUser } = useAuth();
-  const navigate = useNavigate();
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+}
 
-  const sidebarClass: string = isSidebarOpen ? "sidebar-open" : "sidebar-closed";
+const navigation = [
+  { name: 'Dashboard', href: '/', icon: HomeIcon },
+  { name: 'Products', href: '/products', icon: ShoppingBagIcon },
+  { name: 'Orders', href: '/orders', icon: ShoppingCartIcon },
+  { name: 'Users', href: '/users', icon: UserGroupIcon },
+  { name: 'Revenue', href: '/revenue', icon: ChartBarIcon },
+  { name: 'Categories', href: '/categories', icon: Cog6ToothIcon },
+  { name: 'Help Desk', href: '/help-desk', icon: QuestionMarkCircleIcon },
+  { name: 'Notifications', href: '/notifications', icon: BellIcon },
+  { name: 'Profile', href: '/profile', icon: UserCircleIcon },
+];
 
-  const navActiveClass: string =
-    "block dark:bg-whiteSecondary flex items-center self-stretch gap-4 py-4 px-6 cursor-pointer max-xl:py-3 dark:text-blackPrimary bg-white text-blackPrimary";
-  const navInactiveClass: string =
-    "block flex items-center self-stretch gap-4 py-4 px-6 dark:bg-blackPrimary dark:hover:bg-blackSecondary cursor-pointer max-xl:py-3 dark:text-whiteSecondary hover:bg-white text-blackPrimary bg-whiteSecondary";
-
-  // Hàm logout
-  const handleLogout = () => {
-    logoutUser();
-    navigate("/login");
-  };
+const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
+  const location = useLocation();
 
   return (
-    <div className="relative">
+    <>
+      {/* Mobile backdrop */}
       <div
-        className={`w-72 h-[100vh] dark:bg-blackPrimary bg-whiteSecondary pt-6 xl:sticky xl:top-0 xl:z-10 max-xl:fixed max-xl:top-0 max-xl:z-10 xl:translate-x-0 ${sidebarClass}`}
+        className={`fixed inset-0 z-20 transition-opacity bg-black opacity-50 lg:hidden ${
+          isOpen ? 'block' : 'hidden'
+        }`}
+        onClick={() => setIsOpen(false)}
+      />
+
+      {/* Sidebar */}
+      <div
+        className={`fixed inset-y-0 left-0 z-30 w-64 overflow-y-auto transition duration-300 transform bg-white dark:bg-gray-800 lg:translate-x-0 lg:static lg:inset-0 ${
+          isOpen ? 'translate-x-0 ease-out' : '-translate-x-full ease-in'
+        }`}
       >
-        <HiOutlineX
-          className="dark:text-whiteSecondary text-blackPrimary text-2xl ml-auto mb-2 mr-2 cursor-pointer xl:py-3"
-          onClick={() => dispatch(setSidebar())}
-        />
-        <div>
-          {/* Dashboard */}
-          <NavLink
-            to="/"
-            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+        <div className="flex items-center justify-between flex-shrink-0 p-4">
+          <Link to="/" className="text-xl font-semibold text-gray-800 dark:text-white">
+            Your Logo
+          </Link>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="p-1 -mr-1 rounded-md lg:hidden focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            <HiOutlineHome className="text-xl" />
-            <span className="text-lg">Dashboard</span>
-          </NavLink>
-
-          {/* Products Dropdown */}
-          <div
-            onClick={() => setIsProductOpen(!isProductOpen)}
-            className="block flex items-center justify-between self-stretch gap-4 py-4 px-6 dark:bg-blackPrimary dark:hover:bg-blackSecondary cursor-pointer max-xl:py-3 dark:text-whiteSecondary hover:bg-white text-blackPrimary bg-whiteSecondary"
-          >
-            <div className="flex items-center gap-4">
-              <HiOutlineDevicePhoneMobile className="text-xl" />
-              <span className="text-lg">Products</span>
-            </div>
-            <HiOutlineChevronDown className={`text-lg transition-transform ${isProductOpen ? "rotate-180" : ""}`} />
-          </div>
-
-          {isProductOpen && (
-            <div className="pl-8">
-              <NavLink
-                to="/products/import"
-                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-              >
-                Add to Stock
-              </NavLink>
-              <NavLink
-                to="/products/confirmStock"
-                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-              >
-                Confirm Stock
-              </NavLink>
-              <NavLink
-                to="/products"
-                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-              >
-                Export Product List
-              </NavLink>
-              <NavLink
-                to="/products/historyStock"
-                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-              >
-                History Stock
-              </NavLink>
-
-              <NavLink
-                to="/products/price-manage"
-                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-              >
-                Price Product
-              </NavLink>
-
-              <NavLink
-                to="/products/historyPrice"
-                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-              >
-                History Price
-              </NavLink>
-
-            </div>
-          )}
-          
-          {/* Revenue */}
-          <NavLink
-            to="/revenue"
-            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-          >
-            <HiOutlineTruck className="text-xl" />
-            <span className="text-lg">Revenue</span>
-          </NavLink>
-
-          {/* Users */}
-          <NavLink
-            to="/users"
-            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-          >
-            <HiOutlineUser className="text-xl" />
-            <span className="text-lg">Users</span>
-          </NavLink>
-
-          <NavLink
-            to="/orders"
-            className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-          >
-            <HiOutlineTruck className="text-xl" />
-            <span className="text-lg">Orders</span>
-          </NavLink>
-
-          {/* Auth */}
-          <div
-            onClick={() => setIsAuthOpen(!isAuthOpen)}
-            className="block flex items-center self-stretch gap-4 py-4 px-6 dark:bg-blackPrimary dark:hover:bg-blackSecondary cursor-pointer max-xl:py-3 dark:text-whiteSecondary hover:bg-white text-blackPrimary bg-whiteSecondary"
-          >
-            <HiUserGroup className="text-xl" />
-            <span className="text-lg">Auth</span>
-          </div>
-
-          {isAuthOpen && (
-            <div>
-              {token ? (
-                <div onClick={handleLogout} className={navInactiveClass}>
-                  <HiLogin className="text-xl" />
-                  <span className="text-lg">Logout</span>
-                </div>
-              ) : (
-                <NavLink
-                  to="/login"
-                  className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
-                >
-                  <HiLogin className="text-xl" />
-                  <span className="text-lg">Login</span>
-                </NavLink>
-              )}
-            </div>
-          )}
+            <XMarkIcon className="w-6 h-6" />
+          </button>
         </div>
+
+        <nav className="mt-5 space-y-1 px-2">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`group flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out ${
+                  isActive
+                    ? 'bg-indigo-500 text-white'
+                    : 'text-gray-600 hover:bg-indigo-50 dark:text-gray-300 dark:hover:bg-gray-700'
+                }`}
+              >
+                <item.icon
+                  className={`mr-3 flex-shrink-0 h-6 w-6 transition-colors duration-150 ease-in-out ${
+                    isActive ? 'text-white' : 'text-gray-400 group-hover:text-indigo-500 dark:group-hover:text-white'
+                  }`}
+                />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
-    </div>
+    </>
   );
 };
 
