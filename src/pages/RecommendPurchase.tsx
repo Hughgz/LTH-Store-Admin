@@ -8,19 +8,19 @@ const RecommendPurchase = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // State cho các tham số người dùng nhập vào
+
   const [date, setDate] = useState<string>("");
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Hàm gửi yêu cầu khuyến nghị đến API
+
   const fetchRecommendations = async () => {
-    // Kiểm tra dữ liệu đầu vào
+ 
     if (!date) {
       setFormError("Please select a valid date.");
       return;
     }
 
-    // Kiểm tra xem ngày nhập vào có lớn hơn ngày hiện tại không
+
     const selectedDate = new Date(date);
     const currentDate = new Date();
     if (selectedDate <= currentDate) {
@@ -28,7 +28,7 @@ const RecommendPurchase = () => {
       return;
     }
 
-    // Log giá trị trước khi gọi API
+
     console.log("Before API call - Selected Date:", date);
 
     setLoading(true);
@@ -64,7 +64,7 @@ const RecommendPurchase = () => {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              min={new Date().toISOString().split("T")[0]} // Đảm bảo ngày chọn là lớn hơn ngày hiện tại
+              min={new Date().toISOString().split("T")[0]} 
               className="border rounded-lg px-3 py-2 w-1/3"
             />
           </div>

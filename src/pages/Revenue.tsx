@@ -95,9 +95,9 @@ const Revenue = () => {
         case "week":
           // Get the start and end date of the week
           const startOfWeek = new Date(selectedDate);
-          startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1); // Get the start of the week
+          startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1); 
           const endOfWeek = new Date(startOfWeek);
-          endOfWeek.setDate(startOfWeek.getDate() + 6); // Get the end of the week
+          endOfWeek.setDate(startOfWeek.getDate() + 6); 
           dateRange = `${startOfWeek.toISOString().split("T")[0]} to ${endOfWeek.toISOString().split("T")[0]}`;
           break;
 
@@ -110,7 +110,7 @@ const Revenue = () => {
 
         case "quarter":
           // Calculate the quarter and get the start and end date of the quarter
-          const quarter = Math.floor((selectedDate.getMonth() + 3) / 3); // Get the quarter (1 to 4)
+          const quarter = Math.floor((selectedDate.getMonth() + 3) / 3);
           const startOfQuarter = new Date(selectedDate.getFullYear(), (quarter - 1) * 3, 2);
           const endOfQuarter = new Date(selectedDate.getFullYear(), quarter * 3, 1);
           dateRange = `${startOfQuarter.toISOString().split("T")[0]} to ${endOfQuarter.toISOString().split("T")[0]}`;
