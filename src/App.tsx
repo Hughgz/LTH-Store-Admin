@@ -24,6 +24,7 @@ import Revenue from "./pages/Revenue";
 import HistoryStock from "./pages/HistoryStock";
 import PriceManage from "./pages/PriceManage";
 import HistoryPrice from "./pages/HistoryPrice";
+import RecommendPurchase from "./pages/RecommendPurchase";
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -116,6 +117,10 @@ const router = createBrowserRouter([
       {
         path: "products/historyPrice",
         element: <HistoryPrice />,
+      },
+      {
+        path: "products/recommendPurchase",
+        element: <RecommendPurchase />,
       },
     ],
     

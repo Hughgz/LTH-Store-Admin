@@ -17,11 +17,32 @@ interface ProductPrice {
   brand?: string;
 }
 const HistoryPrice = () => {
+<<<<<<< HEAD
+=======
+  interface ProductPrice {
+    id: number;
+    createdAt: string;
+    startDate: string;
+    endDate: string;
+    productSizeId: number;
+    sellingPrice: number;
+    productPriceStatus: string;
+    description: string;
+    productName?: string;
+    size?: string;
+    brand?: string;
+  }
+
+>>>>>>> 36a8d018cbd8580a2bf522b59d12dff12adbda22
   const [productPrices, setProductPrices] = useState<ProductPrice[]>([]);
   const [productSizeId, setProductSizeId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [productsAndSizes, setProductsAndSizes] = useState<{ name: string; size: string; id: number }[]>([]);
+<<<<<<< HEAD
   const [searchTerm, setSearchTerm] = useState("");
+=======
+  const [searchTerm, setSearchTerm] = useState(""); 
+>>>>>>> 36a8d018cbd8580a2bf522b59d12dff12adbda22
   const rowsPerPage = 5;
   const visiblePageCount = 3;
 
@@ -110,12 +131,21 @@ const HistoryPrice = () => {
     }
   }, [productSizeId]);
 
+<<<<<<< HEAD
 
   const filteredProductsAndSizes = searchTerm
     ? productsAndSizes.filter((item) =>
     (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (typeof item.size === 'string' && item.size.toLowerCase().includes(searchTerm.toLowerCase())))
     )
+=======
+  
+  const filteredProductsAndSizes = searchTerm
+    ? productsAndSizes.filter((item) =>
+        (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (typeof item.size === 'string' && item.size.toLowerCase().includes(searchTerm.toLowerCase())))
+      )
+>>>>>>> 36a8d018cbd8580a2bf522b59d12dff12adbda22
     : [];  // Nếu searchTerm trống, không hiển thị
 
   return (
@@ -164,6 +194,7 @@ const HistoryPrice = () => {
           {/* Hiển thị kết quả tìm kiếm dưới dạng dropdown */}
           {searchTerm && filteredProductsAndSizes.length > 0 && (
             <div className="mt-0 ml-8 absolute bg-white border border-gray-600 w-60 max-h-40 overflow-y-auto z-10">
+<<<<<<< HEAD
               <ul>
                 {filteredProductsAndSizes.map((item) => (
                   <li
@@ -179,6 +210,23 @@ const HistoryPrice = () => {
                 ))}
               </ul>
             </div>
+=======
+            <ul>
+              {filteredProductsAndSizes.map((item) => (
+                <li
+                  key={item.id}
+                  onClick={() => {
+                    setSearchTerm(`${item.name} - ${item.size}`);
+                    setProductSizeId(item.id.toString());
+                  }}
+                  className="cursor-pointer hover:bg-gray-200 px-4 py-2"
+                >
+                  {item.name} - {item.size}
+                </li>
+              ))}
+            </ul>
+          </div>
+>>>>>>> 36a8d018cbd8580a2bf522b59d12dff12adbda22
           )}
 
           <table className="min-w-full table-auto border-collapse mt-5">
@@ -209,6 +257,7 @@ const HistoryPrice = () => {
                     <td className="px-4 py-6 border-b text-center">{HistoryPrice.endDate}</td>
                     <td className="px-4 py-6 border-b text-center">{HistoryPrice.productName}</td>
                     <td className="px-4 py-6 border-b text-center">{HistoryPrice.size}</td>
+<<<<<<< HEAD
                     <td className="px-4 py-6 border-b text-center">
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
@@ -222,6 +271,14 @@ const HistoryPrice = () => {
                         <span className="text-green-600">Active</span>
                       ) : HistoryPrice.productPriceStatus == "1" ? (
                         <span className="text-gray-600">Inactive</span>
+=======
+                    <td className="px-4 py-6 border-b text-center">{new Intl.NumberFormat("vi-VN").format(HistoryPrice.sellingPrice)} VNĐ</td>
+                    <td className="px-4 py-6 border-b text-center">
+                      {HistoryPrice.productPriceStatus == "0" ? (
+                        <span className="text-green-600">Active</span>
+                      ) : HistoryPrice.productPriceStatus == "1" ? (
+                        <span className="text-red-600">Inactive</span>
+>>>>>>> 36a8d018cbd8580a2bf522b59d12dff12adbda22
                       ) : HistoryPrice.productPriceStatus == "2" ? (
                         <span className="text-yellow-600">Pending</span>
                       ) : (

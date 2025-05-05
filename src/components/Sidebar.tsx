@@ -100,6 +100,12 @@ const Sidebar = () => {
                 History Price
               </NavLink>
 
+              <NavLink
+                to="/products/recommendPurchase"
+                className={(isActiveObj) => (isActiveObj.isActive ? navActiveClass : navInactiveClass)}
+              >
+                Recommend Purchase
+              </NavLink>
             </div>
           )}
           
