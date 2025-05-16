@@ -6,7 +6,7 @@ import SelectInput from "../components/SelectInput";
 import { useState, useEffect } from "react";
 import productApi from "../utils/api/productApi";
 import purchaseReceiptApi from "../utils/api/purchaseReceiptsApi";
-
+import { useLocation } from "react-router-dom"; 
 interface Product {
   productID: number;
   name: string;
@@ -58,6 +58,8 @@ const AddToStock: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [paymentType, setPaymentType] = useState("cash"); // Mặc định cash
+  const location = useLocation();
+  const importedRecommendations = location.state?.selectedRecommendations || [];
 
   const [selectedProducts, setSelectedProducts] = useState<{
     product: Product;
@@ -225,7 +227,42 @@ const AddToStock: React.FC = () => {
     );
   };
 
-
+  useEffect(() => {
+    if (importedRecommendations.length > 0) {
+      const newProducts = importedRecommendations
+        .map((item: any) => {
+          // Tìm sản phẩm đầy đủ từ danh sách products
+          const fullProduct = products.find((p) => p.name === item.ProductName);
+  
+          if (!fullProduct) {
+     
+           
+            return null;
+          }
+  
+          return {
+            product: fullProduct,
+            size: item.Size,
+            price: item.PurchaseCost,
+            quantity: item.RecommendedQuantity,
+            supplierId: 1, // Giá trị mặc định
+          };
+        })
+        .filter((p) => p !== null);
+  
+      setSelectedProducts((prev) => {
+        const existingProducts = new Set(
+          prev.map((p) => `${p.product.productID}-${p.size}`)
+        );
+  
+        const filteredNewProducts = (newProducts as any[]).filter(
+          (p) => !existingProducts.has(`${p.product.productID}-${p.size}`)
+        );
+  
+        return [...prev, ...filteredNewProducts];
+      });
+    }
+  }, [importedRecommendations, products]);
 
   return (
     <div className="h-auto border-t border-blackSecondary flex dark:bg-blackPrimary bg-whiteSecondary">

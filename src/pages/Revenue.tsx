@@ -6,24 +6,20 @@ import { RootState, AppDispatch } from "../store";
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
 
-const ITEMS_PER_PAGE = 5;
-const getFirstAndLastDayOfMonth = () => {
-  const now = new Date();
-  const firstDay = new Date(now.getFullYear(), now.getMonth(), 2);
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+interface PredictedRevenueItem {
+  date: string;
+  predicted_revenue_vnd: number;
+}
 
-  return {
-    fromDate: firstDay.toISOString().split("T")[0],
-    toDate: lastDay.toISOString().split("T")[0],
-  };
-};
+const ITEMS_PER_PAGE = 5;
 
 const Revenue = () => {
   const dispatch = useDispatch<AppDispatch>();
   const revenue = useSelector((state: RootState) => state.revenue);
 
   const [filters, setFilters] = useState({
-    ...getFirstAndLastDayOfMonth(),
+    fromDate: new Date().toISOString().split("T")[0],
+    toDate: new Date().toISOString().split("T")[0],
     filterType: "day",
   });
 
@@ -34,12 +30,9 @@ const Revenue = () => {
 
   const [showPredictionForm, setShowPredictionForm] = useState(false);
 
-  // Set default date to tomorrow (1 day after current date)
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1); // Set to tomorrow
-
   const [predictionParams, setPredictionParams] = useState({
-    date: tomorrow.toISOString().split("T")[0],
+    start_date: new Date().toISOString().split("T")[0],
+    end_date: new Date().toISOString().split("T")[0],
     order_count: 1,
     item_count: 1,
     period: "day", // Default to day
@@ -69,63 +62,130 @@ const Revenue = () => {
     currentPage * ITEMS_PER_PAGE
   );
 
-  // Fetch predicted revenue from the API
+  const handlePeriodChange = (newPeriod: string) => {
+    const selectedDate = new Date(predictionParams.start_date);
+    let dateRange = "";
+
+    switch (newPeriod) {
+      case "week":
+        const startOfWeek = new Date(selectedDate);
+        startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1); // Set to Monday
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to Sunday
+        dateRange = `${startOfWeek.toISOString().split("T")[0]} to ${endOfWeek.toISOString().split("T")[0]}`;
+        break;
+
+      case "month":
+        const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+        const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0); // Last day of the month
+        dateRange = `${startOfMonth.toISOString().split("T")[0]} to ${endOfMonth.toISOString().split("T")[0]}`;
+        break;
+
+      case "quarter":
+        const quarter = Math.floor((selectedDate.getMonth() + 3) / 3);
+        const startOfQuarter = new Date(selectedDate.getFullYear(), (quarter - 1) * 3, 1);
+        const endOfQuarter = new Date(selectedDate.getFullYear(), quarter * 3, 0); // End date of the quarter
+        dateRange = `${startOfQuarter.toISOString().split("T")[0]} to ${endOfQuarter.toISOString().split("T")[0]}`;
+        break;
+
+      default:
+        dateRange = selectedDate.toISOString().split("T")[0];
+        break;
+    }
+
+    setPredictionParams((prevParams) => ({
+      ...prevParams,
+      period: newPeriod,
+      dateRange: dateRange,
+    }));
+  };
+
   const fetchPredictedRevenue = async () => {
     try {
       setLoadingPrediction(true);
       setErrorMessage(null);
       setFormError(null);
-
-      if (!predictionParams.date || predictionParams.order_count <= 0 || predictionParams.item_count <= 0) {
+  
+      // Tính toán date range dựa trên period
+      let start_date: string;
+      let end_date: string;
+  
+      const selectedDate = new Date(predictionParams.start_date); // sử dụng start_date đã được chọn
+  
+      switch (predictionParams.period) {
+        case "week":
+          const startOfWeek = new Date(selectedDate);
+          startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1); // Tính ngày bắt đầu tuần
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 6); // Tính ngày kết thúc tuần
+          start_date = startOfWeek.toISOString().split("T")[0];
+          end_date = endOfWeek.toISOString().split("T")[0];
+          break;
+  
+        case "month":
+          const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 2); // Tính ngày bắt đầu tháng
+          const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1); // Tính ngày kết thúc tháng
+          start_date = startOfMonth.toISOString().split("T")[0];
+          end_date = endOfMonth.toISOString().split("T")[0];
+          break;
+  
+        case "quarter":
+          const quarter = Math.floor((selectedDate.getMonth() + 3) / 3); // Tính quý
+          const startOfQuarter = new Date(selectedDate.getFullYear(), (quarter - 1) * 3, 2); // Tính ngày bắt đầu quý
+          const endOfQuarter = new Date(selectedDate.getFullYear(), quarter * 3, 1); // Tính ngày kết thúc quý
+          start_date = startOfQuarter.toISOString().split("T")[0];
+          end_date = endOfQuarter.toISOString().split("T")[0];
+          break;
+  
+        case "day":
+          // Nếu "day", lấy toàn bộ khoảng thời gian từ start_date đến end_date
+          start_date = predictionParams.start_date;
+          end_date = predictionParams.end_date;
+          break;
+  
+        default:
+          start_date = selectedDate.toISOString().split("T")[0]; // Nếu không phải các trường hợp trên, sử dụng ngày đã chọn
+          end_date = selectedDate.toISOString().split("T")[0];
+          break;
+      }
+  
+      console.log("Calculated Date Range:", start_date, "to", end_date); // In ra kết quả để kiểm tra
+  
+      // Kiểm tra các tham số trước khi gửi yêu cầu
+      console.log("Sending request with parameters:", {
+        start_date,
+        end_date,
+        order_count: predictionParams.order_count,
+        item_count: predictionParams.item_count,
+      });
+  
+      // Kiểm tra dữ liệu đầu vào
+      if (!start_date || !end_date || predictionParams.order_count <= 0 || predictionParams.item_count <= 0) {
         setFormError("Please fill in all fields correctly.");
         return;
       }
-
-      const selectedDate = new Date(predictionParams.date);
-      const currentDate = new Date();
-      if (selectedDate <= currentDate) {
-        setFormError("Prediction date must be later than today.");
-        return;
+  
+      // Gửi yêu cầu API với các tham số đã tính toán
+      const response = await axios.post("http://localhost:8000/predict_revenue", {
+        start_date,
+        end_date,
+        order_count: predictionParams.order_count,
+        item_count: predictionParams.item_count,
+      });
+  
+      // Kiểm tra phản hồi từ API
+      console.log("API Response:", response.data);
+  
+      if (response.data && response.data.predictions) {
+        const predictions = response.data.predictions;
+        console.log("Predictions data:", predictions);
+  
+        // Cập nhật dữ liệu dự báo
+        setPredictedRevenue(predictions);
+      } else {
+        setErrorMessage("No predictions found in the response.");
       }
-
-      let dateRange: string;
-
-      // Depending on the period, calculate the date range for prediction
-      switch (predictionParams.period) {
-        case "week":
-          // Get the start and end date of the week
-          const startOfWeek = new Date(selectedDate);
-          startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1); 
-          const endOfWeek = new Date(startOfWeek);
-          endOfWeek.setDate(startOfWeek.getDate() + 6); 
-          dateRange = `${startOfWeek.toISOString().split("T")[0]} to ${endOfWeek.toISOString().split("T")[0]}`;
-          break;
-
-        case "month":
-          // Get the start and end date of the month
-          const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 2);
-          const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1);
-          dateRange = `${startOfMonth.toISOString().split("T")[0]} to ${endOfMonth.toISOString().split("T")[0]}`;
-          break;
-
-        case "quarter":
-          // Calculate the quarter and get the start and end date of the quarter
-          const quarter = Math.floor((selectedDate.getMonth() + 3) / 3);
-          const startOfQuarter = new Date(selectedDate.getFullYear(), (quarter - 1) * 3, 2);
-          const endOfQuarter = new Date(selectedDate.getFullYear(), quarter * 3, 1);
-          dateRange = `${startOfQuarter.toISOString().split("T")[0]} to ${endOfQuarter.toISOString().split("T")[0]}`;
-          break;
-
-        default:
-          // For "day" case, we use the selected date as is
-          dateRange = selectedDate.toISOString().split("T")[0];
-      }
-
-      console.log("Data sent to API:", { ...predictionParams, dateRange });
-
-      const response = await axios.post("http://localhost:8000/predict_revenue", { ...predictionParams, dateRange });
-
-      setPredictedRevenue(response.data.predicted_revenue_vnd);
+  
     } catch (error) {
       console.error("Error fetching predicted revenue:", error);
       setErrorMessage("Failed to fetch predicted revenue. Please try again.");
@@ -134,8 +194,9 @@ const Revenue = () => {
       setLoadingPrediction(false);
     }
   };
+  
+  
 
-  // Show prediction form when "Predict Revenue" is clicked
   const handleShowPredictionForm = () => {
     setShowPredictionForm((prev) => {
       if (prev) {
@@ -178,7 +239,6 @@ const Revenue = () => {
               Monthly
             </button>
 
-            {/* Predict Revenue Button */}
             <button
               onClick={handleShowPredictionForm}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg ml-auto"
@@ -187,104 +247,151 @@ const Revenue = () => {
             </button>
           </div>
 
-          {/* Prediction Form */}
-          {showPredictionForm && (
-            <div className="mb-6 p-4 border border-gray-300 rounded-lg">
-              <div className="mb-4">
-                <label className="block text-gray-700 dark:text-gray-300">Date</label>
-                <input
-                  type="date"
-                  value={predictionParams.date}
-                  onChange={(e) => setPredictionParams({ ...predictionParams, date: e.target.value })}
-                  className="border rounded-lg px-3 py-2 w-1/3"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 dark:text-gray-300">Order Count</label>
-                <input
-                  type="number"
-                  value={predictionParams.order_count}
-                  onChange={(e) => setPredictionParams({ ...predictionParams, order_count: +e.target.value })}
-                  className="border rounded-lg px-3 py-2 w-1/3"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 dark:text-gray-300">Item Count</label>
-                <input
-                  type="number"
-                  value={predictionParams.item_count}
-                  onChange={(e) => setPredictionParams({ ...predictionParams, item_count: +e.target.value })}
-                  className="border rounded-lg px-3 py-2 w-1/3"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 dark:text-gray-300">Prediction Period</label>
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => setPredictionParams({ ...predictionParams, period: "day" })}
-                    className={`px-4 py-2 border rounded-lg ${predictionParams.period === "day" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
-                  >
-                    Day
-                  </button>
-                  <button
-                    onClick={() => setPredictionParams({ ...predictionParams, period: "week" })}
-                    className={`px-4 py-2 border rounded-lg ${predictionParams.period === "week" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
-                  >
-                    Week
-                  </button>
-                  <button
-                    onClick={() => setPredictionParams({ ...predictionParams, period: "month" })}
-                    className={`px-4 py-2 border rounded-lg ${predictionParams.period === "month" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
-                  >
-                    Month
-                  </button>
-                  <button
-                    onClick={() => setPredictionParams({ ...predictionParams, period: "quarter" })}
-                    className={`px-4 py-2 border rounded-lg ${predictionParams.period === "quarter" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
-                  >
-                    Quarter
-                  </button>
+          <div className="flex gap-x-6 mb-6">
+            {showPredictionForm && (
+              <div className="p-4 border border-gray-300 rounded-lg w-1/2">
+                <div className="mb-4">
+                  <label className="block text-gray-700 dark:text-gray-300">Start Date</label>
+                  <input
+                    type="date"
+                    value={predictionParams.start_date}
+                    onChange={(e) => setPredictionParams({ ...predictionParams, start_date: e.target.value })}
+                    className="border rounded-lg px-3 py-2 w-full"
+                  />
                 </div>
-              </div>
-              <button
-                onClick={fetchPredictedRevenue}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg"
-              >
-                Predict
-              </button>
-              {formError && (
-                <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                  {formError}
+                <div className="mb-4">
+                  <label className="block text-gray-700 dark:text-gray-300">End Date</label>
+                  <input
+                    type="date"
+                    value={predictionParams.end_date}
+                    onChange={(e) => setPredictionParams({ ...predictionParams, end_date: e.target.value })}
+                    className="border rounded-lg px-3 py-2 w-full"
+                  />
                 </div>
-              )}
-            </div>
-          )}
+                <div className="mb-4">
+                  <label className="block text-gray-700 dark:text-gray-300">Order Count</label>
+                  <input
+                    type="number"
+                    value={predictionParams.order_count}
+                    onChange={(e) => setPredictionParams({ ...predictionParams, order_count: +e.target.value })}
+                    className="border rounded-lg px-3 py-2 w-full"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 dark:text-gray-300">Item Count</label>
+                  <input
+                    type="number"
+                    value={predictionParams.item_count}
+                    onChange={(e) => setPredictionParams({ ...predictionParams, item_count: +e.target.value })}
+                    className="border rounded-lg px-3 py-2 w-full"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 dark:text-gray-300">Prediction Period</label>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => handlePeriodChange("day")}
+                      className={`px-4 py-2 border rounded-lg ${predictionParams.period === "day" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
+                    >
+                      Day
+                    </button>
+                    <button
+                      onClick={() => handlePeriodChange("week")}
+                      className={`px-4 py-2 border rounded-lg ${predictionParams.period === "week" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
+                    >
+                      Week
+                    </button>
+                    <button
+                      onClick={() => handlePeriodChange("month")}
+                      className={`px-4 py-2 border rounded-lg ${predictionParams.period === "month" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
+                    >
+                      Month
+                    </button>
+                    <button
+                      onClick={() => handlePeriodChange("quarter")}
+                      className={`px-4 py-2 border rounded-lg ${predictionParams.period === "quarter" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
+                    >
+                      Quarter
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={fetchPredictedRevenue}
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                >
+                  Predict
+                </button>
+                {formError && (
+                  <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                    {formError}
+                  </div>
+                )}
+              </div>
+            )}
 
-          {/* Show Loading or Error Message for Prediction */}
-          {loadingPrediction && (
-            <div className="text-center text-gray-500">Loading prediction...</div>
-          )}
-          {errorMessage && (
-            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-              {errorMessage}
-            </div>
-          )}
+            {loadingPrediction && (
+              <div className="mb-4 p-4 bg-black-100 pl-[15.5rem] text-black rounded flex items-center justify-center">
+                Loading prediction...
+              </div>
+            )}
+            {errorMessage && (
+              <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                {errorMessage}
+              </div>
+            )}
 
-          {/* Predicted Revenue */}
-          {predictedRevenue !== null && !loadingPrediction && !errorMessage && (
-            <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-              Predicted revenue for {new Date(predictionParams.date).toLocaleDateString("en-US")}:{" "}
-              {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(predictedRevenue)}
-            </div>
-          )}
+            {predictedRevenue !== null && !loadingPrediction && !errorMessage && (
+              <div className="p-4 bg-green-100 border border-green-400 text-green-700 rounded w-1/2">
+                <h2 className="text-xl font-semibold text-center text-black">PREDICTION TABLE</h2>
+                <div className="flex justify-between mb-2 font-semibold">
+                  <span className="text-lg">Predict Date</span>
+                  <span className="text-lg">Predict Revenue</span>
+                </div>
+                <ul className="list-disc ml-6 mt-2">
+                  {Array.isArray(predictedRevenue) && predictedRevenue.slice((currentPage - 1) * 10, currentPage * 10).map((item: PredictedRevenueItem, index: number) => (
+                    <li key={index} className="flex justify-between text-lg">
+                      <span>{new Date(item.date).toLocaleDateString("en-US")}</span>
+                      <span>
+                        {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.predicted_revenue_vnd)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                {Array.isArray(predictedRevenue) && predictedRevenue.length > 10 && (
+                  <div className="flex justify-between items-center mt-4">
+                    <button
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      className={`px-4 py-2 rounded-lg border ${currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"}`}
+                    >
+                      Previous
+                    </button>
+
+                    <span className="text-gray-700 dark:text-gray-300 text-lg">
+                      Page {currentPage} of {Math.ceil(predictedRevenue.length / 10)}
+                    </span>
+
+                    <button
+                      disabled={currentPage === Math.ceil(predictedRevenue.length / 10)}
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      className={`px-4 py-2 rounded-lg border ${currentPage === Math.ceil(predictedRevenue.length / 10) ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-500 text-white"}`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Existing Revenue Table */}
           <div className="overflow-x-auto rounded-lg shadow-md">
             <table className="w-full border-collapse bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
               <thead>
                 <tr className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-                  <th className="p-4 text-left">Date</th>
-                  <th className="p-4 text-left">Revenue</th>
+                  <th className="p-4 text-left text-xl">Date</th>
+                  <th className="p-4 text-left text-xl">Revenue</th>
                 </tr>
               </thead>
               <tbody className="min-h-[250px]">
@@ -349,7 +456,7 @@ const Revenue = () => {
 
           {/* Total Revenue */}
           <div className="mt-6 flex justify-end items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-lg">
-            <span className="text-lg font-semibold text-gray-700 dark:text-white mr-4">
+            <span className="text-lg font-semibold text-gray-700 dark:text-white mr-4 text-xl">
               Total Revenue:
             </span>
             <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
