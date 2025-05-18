@@ -1,9 +1,8 @@
-import { Sidebar, WhiteButton } from "../components";
+import { Sidebar } from "../components";
 import { HiOutlinePlus, HiOutlineChevronRight, HiOutlineSearch } from "react-icons/hi";
 import { AiOutlineExport } from "react-icons/ai";
 import { useState } from "react";
 import CategoryTable from "../components/CategoryTable";
-import categoriesData from "../data/data.json"; // Import dữ liệu mẫu
 
 // Định nghĩa interface có productCount
 interface Category {

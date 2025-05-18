@@ -5,6 +5,8 @@ import { processRevenueData } from "../redux/reducers/revenueSlice";
 import { RootState, AppDispatch } from "../store";
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { formatPrice } from "../utils/formatters";
 
 interface PredictedRevenueItem {
   date: string;
@@ -33,8 +35,6 @@ const Revenue = () => {
   const [predictionParams, setPredictionParams] = useState({
     start_date: new Date().toISOString().split("T")[0],
     end_date: new Date().toISOString().split("T")[0],
-    order_count: 1,
-    item_count: 1,
     period: "day", // Default to day
   });
 
@@ -74,20 +74,6 @@ const Revenue = () => {
         endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to Sunday
         dateRange = `${startOfWeek.toISOString().split("T")[0]} to ${endOfWeek.toISOString().split("T")[0]}`;
         break;
-
-      case "month":
-        const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-        const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0); // Last day of the month
-        dateRange = `${startOfMonth.toISOString().split("T")[0]} to ${endOfMonth.toISOString().split("T")[0]}`;
-        break;
-
-      case "quarter":
-        const quarter = Math.floor((selectedDate.getMonth() + 3) / 3);
-        const startOfQuarter = new Date(selectedDate.getFullYear(), (quarter - 1) * 3, 1);
-        const endOfQuarter = new Date(selectedDate.getFullYear(), quarter * 3, 0); // End date of the quarter
-        dateRange = `${startOfQuarter.toISOString().split("T")[0]} to ${endOfQuarter.toISOString().split("T")[0]}`;
-        break;
-
       default:
         dateRange = selectedDate.toISOString().split("T")[0];
         break;
@@ -105,13 +91,13 @@ const Revenue = () => {
       setLoadingPrediction(true);
       setErrorMessage(null);
       setFormError(null);
-  
+
       // Tính toán date range dựa trên period
       let start_date: string;
       let end_date: string;
-  
+
       const selectedDate = new Date(predictionParams.start_date); // sử dụng start_date đã được chọn
-  
+
       switch (predictionParams.period) {
         case "week":
           const startOfWeek = new Date(selectedDate);
@@ -121,14 +107,14 @@ const Revenue = () => {
           start_date = startOfWeek.toISOString().split("T")[0];
           end_date = endOfWeek.toISOString().split("T")[0];
           break;
-  
+
         case "month":
           const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 2); // Tính ngày bắt đầu tháng
           const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1); // Tính ngày kết thúc tháng
           start_date = startOfMonth.toISOString().split("T")[0];
           end_date = endOfMonth.toISOString().split("T")[0];
           break;
-  
+
         case "quarter":
           const quarter = Math.floor((selectedDate.getMonth() + 3) / 3); // Tính quý
           const startOfQuarter = new Date(selectedDate.getFullYear(), (quarter - 1) * 3, 2); // Tính ngày bắt đầu quý
@@ -136,56 +122,52 @@ const Revenue = () => {
           start_date = startOfQuarter.toISOString().split("T")[0];
           end_date = endOfQuarter.toISOString().split("T")[0];
           break;
-  
+
         case "day":
           // Nếu "day", lấy toàn bộ khoảng thời gian từ start_date đến end_date
           start_date = predictionParams.start_date;
           end_date = predictionParams.end_date;
           break;
-  
+
         default:
           start_date = selectedDate.toISOString().split("T")[0]; // Nếu không phải các trường hợp trên, sử dụng ngày đã chọn
           end_date = selectedDate.toISOString().split("T")[0];
           break;
       }
-  
+
       console.log("Calculated Date Range:", start_date, "to", end_date); // In ra kết quả để kiểm tra
-  
+
       // Kiểm tra các tham số trước khi gửi yêu cầu
       console.log("Sending request with parameters:", {
         start_date,
         end_date,
-        order_count: predictionParams.order_count,
-        item_count: predictionParams.item_count,
       });
-  
+
       // Kiểm tra dữ liệu đầu vào
-      if (!start_date || !end_date || predictionParams.order_count <= 0 || predictionParams.item_count <= 0) {
+      if (!start_date || !end_date) {
         setFormError("Please fill in all fields correctly.");
         return;
       }
-  
+
       // Gửi yêu cầu API với các tham số đã tính toán
       const response = await axios.post("http://localhost:8000/predict_revenue", {
         start_date,
         end_date,
-        order_count: predictionParams.order_count,
-        item_count: predictionParams.item_count,
       });
-  
+
       // Kiểm tra phản hồi từ API
       console.log("API Response:", response.data);
-  
+
       if (response.data && response.data.predictions) {
         const predictions = response.data.predictions;
         console.log("Predictions data:", predictions);
-  
+
         // Cập nhật dữ liệu dự báo
         setPredictedRevenue(predictions);
       } else {
         setErrorMessage("No predictions found in the response.");
       }
-  
+
     } catch (error) {
       console.error("Error fetching predicted revenue:", error);
       setErrorMessage("Failed to fetch predicted revenue. Please try again.");
@@ -194,8 +176,17 @@ const Revenue = () => {
       setLoadingPrediction(false);
     }
   };
-  
-  
+
+  // Format prediction data for the chart
+  const formatPredictionDataForChart = () => {
+    if (Array.isArray(predictedRevenue)) {
+      return predictedRevenue.map((item: PredictedRevenueItem) => ({
+        date: new Date(item.date).toLocaleDateString("en-US"),
+        value: item.predicted_revenue_vnd
+      }));
+    }
+    return [];
+  };
 
   const handleShowPredictionForm = () => {
     setShowPredictionForm((prev) => {
@@ -268,7 +259,7 @@ const Revenue = () => {
                     className="border rounded-lg px-3 py-2 w-full"
                   />
                 </div>
-                <div className="mb-4">
+                {/* <div className="mb-4">
                   <label className="block text-gray-700 dark:text-gray-300">Order Count</label>
                   <input
                     type="number"
@@ -285,7 +276,7 @@ const Revenue = () => {
                     onChange={(e) => setPredictionParams({ ...predictionParams, item_count: +e.target.value })}
                     className="border rounded-lg px-3 py-2 w-full"
                   />
-                </div>
+                </div> */}
                 <div className="mb-4">
                   <label className="block text-gray-700 dark:text-gray-300">Prediction Period</label>
                   <div className="flex gap-4">
@@ -295,7 +286,7 @@ const Revenue = () => {
                     >
                       Day
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => handlePeriodChange("week")}
                       className={`px-4 py-2 border rounded-lg ${predictionParams.period === "week" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
                     >
@@ -312,7 +303,7 @@ const Revenue = () => {
                       className={`px-4 py-2 border rounded-lg ${predictionParams.period === "quarter" ? "bg-gray-500 text-white" : "text-gray-700 dark:text-gray-300"}`}
                     >
                       Quarter
-                    </button>
+                    </button> */}
                   </div>
                 </div>
                 <button
@@ -352,7 +343,7 @@ const Revenue = () => {
                     <li key={index} className="flex justify-between text-lg">
                       <span>{new Date(item.date).toLocaleDateString("en-US")}</span>
                       <span>
-                        {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.predicted_revenue_vnd)}
+                        {formatPrice(item.predicted_revenue_vnd)}
                       </span>
                     </li>
                   ))}
@@ -381,10 +372,47 @@ const Revenue = () => {
                     </button>
                   </div>
                 )}
+
               </div>
             )}
           </div>
-
+          {Array.isArray(predictedRevenue) && predictedRevenue.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold text-center text-black mb-4">Revenue Prediction Chart</h3>
+              <div className="bg-white p-4 rounded-lg shadow-md" style={{ height: '400px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={formatPredictionDataForChart()}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="date"
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <YAxis
+                      tickFormatter={(value) => formatPrice(value, { compact: true, maximumFractionDigits: 1 })}
+                    />
+                    <Tooltip
+                      formatter={(value) => [formatPrice(Number(value)), 'Predicted Revenue']}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      name="Predicted Revenue"
+                      stroke="#4ade80"
+                      strokeWidth={2}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
           {/* Existing Revenue Table */}
           <div className="overflow-x-auto rounded-lg shadow-md">
             <table className="w-full border-collapse bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
@@ -414,7 +442,7 @@ const Revenue = () => {
                     <tr key={`${item.date}-${index}`} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-opacity opacity-100">
                       <td className="p-4">{item.date}</td>
                       <td className="p-4 text-blue-600 dark:text-blue-400 font-semibold">
-                        {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.amount)}
+                        {formatPrice(item.amount)}
                       </td>
                     </tr>
                   ))
@@ -460,7 +488,7 @@ const Revenue = () => {
               Total Revenue:
             </span>
             <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
-              {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(revenue.total)}
+              {formatPrice(revenue.total)}
             </span>
           </div>
         </div>

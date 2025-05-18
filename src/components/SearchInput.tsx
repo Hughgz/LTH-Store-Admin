@@ -1,16 +1,21 @@
-
 import { HiOutlineSearch } from "react-icons/hi";
 
-const SearchInput = () => {
+interface SearchInputProps {
+  placeholder?: string;
+  className?: string;
+}
+
+const SearchInput = ({ placeholder = "Search...", className = "" }: SearchInputProps) => {
   return (
-    <div className="relative max-sm:w-full">
-      <HiOutlineSearch className="dark:text-whiteSecondary absolute top-4 left-3 text-xl text-gray-500" />
+    <div className={`relative w-full ${className}`}>
       <input
         type="text"
-        className="w-[600px] h-[50px] dark:bg-blackPrimary bg-white border border-gray-700 indent-11 outline-0 dark:text-whiteSecondary text-blackPrimary max-sm:w-full focus:border-gray-600"
-        placeholder="Search here..."
+        className="w-full h-10 pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-800 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 transition-all"
+        placeholder={placeholder}
       />
+      <HiOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 text-lg" />
     </div>
   );
 };
+
 export default SearchInput;

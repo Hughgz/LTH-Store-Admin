@@ -5,6 +5,7 @@ import UpdateOrderModal from "./UpdateOrderModal";
 import OrderDetailModal from "./OrderDetailModal";
 import axios from "axios";
 import Spinder from "./Spinder"; // Import Spinder component
+import { formatPrice } from "../utils/formatters";
 
 interface User {
   customerID: string;
@@ -40,21 +41,11 @@ interface OrderTableProps {
 }
 
 const OrderTable: React.FC<OrderTableProps> = ({ orders, users }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(true); // State for loading
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<string>("");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-
-  useEffect(() => {
-    // Simulate loading effect
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000); // 2 seconds loading
-
-    return () => clearTimeout(timer); // Clear timer on component unmount
-  }, []);
 
   const handleOpenUpdateModal = (orderId: string, status: string) => {
     setSelectedOrderId(orderId);
@@ -93,98 +84,132 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, users }) => {
     return user ? `${user.firstName} ${user.lastName}` : "Unknown Customer";
   };
 
-  // Render loading spinner if data is loading
-  if (isLoading) {
-    return <Spinder />;
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "Pending":
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+            Pending
+          </span>
+        );
+      case "Processing":
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+            Processing
+          </span>
+        );
+      case "Shipping":
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+            Shipping
+          </span>
+        );
+      case "Delivered":
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+            Delivered
+          </span>
+        );
+      case "Cancelled":
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+            Cancelled
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+            {status}
+          </span>
+        );
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (!orders || orders.length === 0) {
+    return null;
   }
 
   return (
     <>
-      <table className="mt-6 w-full whitespace-nowrap text-left max-lg:block max-lg:overflow-x-scroll">
-        <colgroup>
-          <col className="w-full sm:w-4/12" />
-          <col className="lg:w-4/12" />
-          <col className="lg:w-2/12" />
-          <col className="lg:w-1/12" />
-          <col className="lg:w-1/12" />
-        </colgroup>
-        <thead className="border-b border-white/10 text-sm leading-6 dark:text-whiteSecondary text-blackPrimary">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-700">
           <tr>
-            <th className="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8">
-              Customer Name
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Customer
             </th>
-            <th className="py-2 pl-0 pr-8 font-semibold table-cell">Date/Time</th>
-            <th className="py-2 pl-0 pr-8 font-semibold table-cell">Price</th>
-            <th className="py-2 pl-0 pr-8 font-semibold table-cell">
-              Payment Type
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Date/Time
             </th>
-            <th className="py-2 pl-0 pr-8 font-semibold table-cell lg:pr-20">
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Price
+            </th>
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Payment
+            </th>
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Status
             </th>
-            <th className="py-2 pl-0 pr-4 text-right font-semibold table-cell sm:pr-6 lg:pr-8">
+            <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5">
+        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
           {orders.map((order) => (
-            <tr key={nanoid()}>
-              <td className="py-4 pl-4 pr-8 sm:pl-6 lg:pl-8">
-                <div className="truncate text-sm font-medium leading-6 dark:text-whiteSecondary text-blackPrimary">
+            <tr key={nanoid()} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+              <td className="px-4 py-4 whitespace-nowrap">
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
                   {getCustomerName(order.customerID)}
                 </div>
-              </td>
-              <td className="py-4 pl-0 table-cell pr-8">
-                <div className="text-sm leading-6 dark:text-whiteSecondary text-blackPrimary">
-                  {new Date(order.dateTime).toLocaleString()}
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  ID: {String(order.orderID).substring(0, 8)}...
                 </div>
               </td>
-              <td className="py-4 pl-0 pr-4 table-cell pr-8">
-                <div className="text-sm leading-6 dark:text-whiteSecondary text-blackPrimary">
-                  {order.totalPrice.toLocaleString() + " VNĐ"}
+              <td className="px-4 py-4 whitespace-nowrap">
+                <div className="text-sm text-gray-700 dark:text-gray-300">
+                  {formatDate(order.dateTime)}
                 </div>
               </td>
-              <td className="py-4 pl-0 pr-4 text-sm leading-6 sm:pr-8 lg:pr-20">
-                <div className="dark:text-whiteSecondary text-blackPrimary">
+              <td className="px-4 py-4 whitespace-nowrap">
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                  {formatPrice(order.totalPrice)}
+                </div>
+              </td>
+              <td className="px-4 py-4 whitespace-nowrap">
+                <div className="text-sm text-gray-700 dark:text-gray-300">
                   {order.paymentType || "N/A"}
                 </div>
               </td>
-              <td className="py-4 pl-0 pr-8 text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell lg:pr-20">
-                <div
-                  className={`text-sm leading-6 py-1 px-2 rounded-full font-semibold ${order.status === "Pending"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : order.status === "Processing"
-                        ? "bg-blue-100 text-blue-800"
-                        : order.status === "Shipping"
-                          ? "bg-orange-100 text-orange-800"
-                          : order.status === "Delivered"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "Cancelled"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-gray-100 text-gray-800"
-                    }`}
-                >
-                  {order.status}
-                </div>
+              <td className="px-4 py-4 whitespace-nowrap">
+                {getStatusBadge(order.status)}
               </td>
-              <td className="py-4 pl-0 pr-4 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
-                <div className="flex gap-x-1 justify-end">
+              <td className="px-4 py-4 whitespace-nowrap text-right">
+                <div className="flex space-x-2 justify-end">
                   <button
-                    onClick={() =>
-                      handleOpenUpdateModal(order.orderID, order.status)
-                    }
-                    className="bg-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 flex justify-center items-center hover:border-gray-400"
+                    onClick={() => handleOpenUpdateModal(order.orderID, order.status)}
+                    className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     aria-label="Edit Order"
                   >
-                    <HiOutlinePencil className="text-lg" />
+                    <HiOutlinePencil className="h-5 w-5" />
                   </button>
 
                   <button
                     onClick={() => handleOpenDetailModal(order)}
-                    className="bg-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 flex justify-center items-center hover:border-gray-400"
+                    className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     aria-label="View Order Details"
                   >
-                    <HiOutlineEye className="text-lg" />
+                    <HiOutlineEye className="h-5 w-5" />
                   </button>
                 </div>
               </td>
@@ -192,6 +217,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, users }) => {
           ))}
         </tbody>
       </table>
+
       <UpdateOrderModal
         isModalOpen={isUpdateModalOpen}
         closeModal={handleCloseUpdateModal}
